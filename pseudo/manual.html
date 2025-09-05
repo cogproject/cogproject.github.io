@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>疑似言語マニュアル</title>
+  <style>
+    body { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; background:#0b1020; color:#eef; padding:20px; line-height:1.6; }
+    h1, h2 { color:#8ad; }
+    code { background:#0a1230; border:1px solid #2a3766; padding:2px 4px; border-radius:4px; }
+    a { color:#8ad; }
+  </style>
+</head>
+<body>
+  <h1>疑似言語マニュアル</h1>
+  <p>この疑似言語は、アルゴリズムやデータ構造を学ぶために設計された教育用の言語です。以下に基本的な構文と機能を紹介します。</p>
+
+  <h2>変数と型</h2>
+  <ul>
+    <li><code>整数型/実数型/文字列型/真偽値</code> の変数宣言</li>
+    <li>配列は <code>x[]</code> のように表記します</li>
+  </ul>
+
+  <h2>入出力</h2>
+  <ul>
+    <li><code>入力(a,b)</code> で複数変数への入力</li>
+    <li><code>出力(...)</code> と <code>改行()</code> で表示</li>
+  </ul>
+
+  <h2>制御構造</h2>
+  <ul>
+    <li><code>if/elseif/else/endif</code>（then は不要）</li>
+    <li><code>for/endfor</code>, <code>while/endwhile</code>, <code>repeat/until</code></li>
+    <li><code>反復(cond)/反復終わり</code> によるループ</li>
+  </ul>
+
+  <h2>その他の機能</h2>
+  <ul>
+    <li><code>レコード型 T ... レコード型終わり</code></li>
+    <li><code>T ポインタ x</code> と <code>新規 T</code> による動的メモリ</li>
+    <li><code>NIL</code> 値</li>
+    <li><code>手続き NAME(...)/手続き終わり</code>、<code>MAIN()</code> の自動実行</li>
+  </ul>
+
+  <p>エラーが発生した場合は、行番号と該当行が表示されます。詳しくはインタープリターのソースコードを参照してください。</p>
+
+  <p><a href="index.html">インタープリターへ戻る</a></p>
+</body>
+</html>
