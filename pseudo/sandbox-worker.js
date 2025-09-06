@@ -290,6 +290,12 @@ function resetInput(tokens){ inputTokens = (tokens || []).slice(); }
         let raw=lines[i];
         const cpos=raw.indexOf('//'); if(cpos!==-1) raw=raw.slice(0,cpos);
         const line=raw.trim();
+        const parenCheck = raw.replace(/".*?"|'.*?'/g,'');
+        let bal=0; let bad=false;
+        for(const ch of parenCheck){
+          if(ch==='(') bal++; else if(ch===')'){ if(bal) bal--; else { bad=true; break; } }
+        }
+        if(bal>0 || bad){ const e=new Error(bad? 'unexpected )' : 'missing ) after argument list'); e.line=curLine; throw e; }
   
         // 空行/コメント行：マークだけ（JS 1行、map 1件）
         if(!line){ out.push(`__mark(${curLine});`); map.push(curLine); continue; }
@@ -434,6 +440,7 @@ self.onmessage = function(e){
     self.postMessage({type:'done'});
   }catch(err){
     let srcLine = __LINE__ || 0;
+    if (!srcLine && err && err.line) srcLine = parseInt(err.line, 10) || 0;
     const stack = String(err && err.stack || '');
     let jsLine = null;
     let offset = 0;
@@ -448,13 +455,16 @@ self.onmessage = function(e){
       if (m) { jsLine = parseInt(m[1], 10); }
     }
     if (!jsLine && (err.lineNumber || err.line)) {
-      jsLine = parseInt(err.lineNumber || err.line, 10);
+      const tmp = parseInt(err.lineNumber || err.line, 10);
+      const jsLines = (__LAST_JS && __LAST_JS.split('\n').length) || 0;
+      if (tmp > 0 && tmp <= jsLines + 1) jsLine = tmp;
     }
     if (Number.isInteger(jsLine) && jsLine > 0) {
       let mapped = __jsLineToPseudo(jsLine - offset);
       if (!mapped) mapped = __jsLineToPseudo(jsLine);
       if (mapped && !srcLine) srcLine = mapped;
     }
+    if (!srcLine) srcLine = 1;
     const srcText = (__SRC_LINES && __SRC_LINES[srcLine-1]!==undefined) ? __SRC_LINES[srcLine-1] : '';
     self.postMessage({type:'error', line: srcLine, message: err.message, sourceLine: srcText});
   }
