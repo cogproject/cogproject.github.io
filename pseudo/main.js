@@ -987,8 +987,9 @@ A ← [10, 7, 8, 9, 1, 5]
       tmp=escapeHtml(tmp);
       const kwRegex=new RegExp('\\b(' + Array.from(KEYWORDS).join('|') + ')\\b','g');
       tmp=tmp.replace(kwRegex,'<span class="kw">$1</span>');
-      tmp=tmp.replace(/([+\\-*/<>=!]|←)/g,'<span class="op">$1</span>');
-      tmp=tmp.replace(/\\b([A-Za-z_][A-Za-z0-9_]*|[\\u3040-\\u30ff\\u4e00-\\u9faf]+)(?=\\()/g,(m)=>{
+      // 演算子を強調表示（- は末尾に移動して解釈エラーを防ぐ）
+      tmp=tmp.replace(/([+*\/<>!=-]|←)/g,'<span class="op">$1</span>');
+      tmp=tmp.replace(/\b([A-Za-z_][A-Za-z0-9_]*|[\u3040-\u30ff\u4e00-\u9faf]+)(?=\()/g,(m)=>{
         return KEYWORDS.has(m)?m:`<span class="fn">${m}</span>`;
       });
       tmp=tmp.replace(/\\u0000(\\d+)\\u0000/g,(_,i)=>`<span class="comment">${escapeHtml(comments[+i])}</span>`);
