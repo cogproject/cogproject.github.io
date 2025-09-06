@@ -431,6 +431,7 @@ return joined;
     // ========= 実行器（構文/実行時の行番号を逆引き） =========
     function run(){
       clearOutput(); resetInput(); updateAd();
+      sanitizeCode();
       const src=$('#code').value;
       const tokens = inputTokens.slice();
       const worker = new Worker('sandbox-worker.js');
@@ -963,7 +964,16 @@ A ← [10, 7, 8, 9, 1, 5]
 
     function escapeHtml(str){ return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
+    // エディタ内に HTML タグが入り込んだ場合に除去する
+    function sanitizeCode(){
+      const cleaned = codeArea.value.replace(/<[^>]*>/g, '');
+      if (cleaned !== codeArea.value) {
+        codeArea.value = cleaned;
+      }
+    }
+
     function highlightCode(){
+      sanitizeCode();
       const commentRegex=/\/\/.*$/gm;
       const comments=[];
       let tmp=codeArea.value.replace(commentRegex,m=>{ comments.push(m); return `\u0000${comments.length-1}\u0000`; });
