@@ -824,7 +824,7 @@ A ← [10, 7, 8, 9, 1, 5]
         // Lomuto 方式
         pivot ← A[r]
         i ← l - 1
-        for (j ← l; j <= r - 1; j ← j + 1)
+        for (j ← l; j < r; j ← j + 1)
             if (A[j] <= pivot)
                 i ← i + 1
                 tmp ← A[i]; A[i] ← A[j]; A[j] ← tmp
