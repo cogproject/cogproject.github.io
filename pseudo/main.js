@@ -961,7 +961,7 @@ A ← [10, 7, 8, 9, 1, 5]
       '整数型','実数型','文字列型','真偽値'
     ]);
 
-    function escapeHtml(str){ return str.replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+    function escapeHtml(str){ return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
     function highlightCode(){
       const commentRegex=/\/\/.*$/gm;
