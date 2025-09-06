@@ -77,8 +77,14 @@ function __jsLineToPseudo(jsLine){
 
 
     // ========= ランタイム =========
-    const $ = (sel)=>document.querySelector(sel);
-    const stdout = $('#stdout');
+      const $ = (sel)=>document.querySelector(sel);
+      const stdout = $('#stdout');
+      const adArea = $('#adArea');
+      const ADS = [
+        'ITパスポートレベルのあなたでも安心！<br><a href="https://example.com/start" target="_blank" rel="noopener" style="color:#8ad;">無料体験はこちら</a>',
+        'ブラウザだけで学べる入門講座<br><a href="https://example.com/start" target="_blank" rel="noopener" style="color:#8ad;">今すぐチャレンジ</a>'
+      ];
+      function updateAd(){ if(adArea){ const idx=Math.floor(Math.random()*ADS.length); adArea.innerHTML=ADS[idx]; } }
     function clearOutput(){ stdout.textContent = ''; }
     function printLine(s=''){ stdout.textContent += s + "\n"; }
     window.__LINE__ = 0; window.__SRC_LINES = [];
@@ -421,7 +427,7 @@ return joined;
   
     // ========= 実行器（構文/実行時の行番号を逆引き） =========
     function run(){
-      clearOutput(); resetInput();
+      clearOutput(); resetInput(); updateAd();
       const src=$('#code').value;
       const tokens = inputTokens.slice();
       const worker = new Worker('sandbox-worker.js');
@@ -968,5 +974,6 @@ A ← [10, 7, 8, 9, 1, 5]
     codeArea.addEventListener('input', updateLineNumbers);
     codeArea.addEventListener('scroll', ()=>{ lineNumbers.scrollTop = codeArea.scrollTop; });
   
-    // 初期は単方向リスト
-    insertExample();
+      // 初期は単方向リスト
+      insertExample();
+      updateAd();
