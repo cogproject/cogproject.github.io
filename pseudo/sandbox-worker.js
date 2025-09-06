@@ -249,6 +249,8 @@ function resetInput(tokens){ inputTokens = (tokens || []).slice(); }
           // 型指定なし: そのまま名前を使用
           const name = p.split(/\s+/).pop();
           names.push(name);
+          // 未指定の場合も arguments から取得
+          push(`let ${name} = arguments[${names.length-1}];`);
         }
         return names;
       }
@@ -437,12 +439,24 @@ self.onmessage = function(e){
     let srcLine = __LINE__ || 0;
     const stack = String(err && err.stack || '');
     let jsLine = null;
+    let offset = 0;
+    let m = stack.match(/worker_pseudo\.js:(\d+):\d+/);
+    if (m) { jsLine = parseInt(m[1], 10); offset = 1; }
+    if (!m) {
+      m = stack.match(/\(worker_pseudo\.js:(\d+):\d+\)/);
+      if (m) { jsLine = parseInt(m[1], 10); offset = 1; }
+    }
+    if (!m) {
+      m = stack.match(/<anonymous>:(\d+):\d+/) || stack.match(/\[eval\]:(\d+):\d+/);
+      if (m) { jsLine = parseInt(m[1], 10); }
+    }
     if (!jsLine && (err.lineNumber || err.line)) {
       jsLine = parseInt(err.lineNumber || err.line, 10);
     }
     if (Number.isInteger(jsLine) && jsLine > 0) {
-      if (mapped) srcLine = mapped;
-    }
+      let mapped = __jsLineToPseudo(jsLine - offset);
+      if (!mapped) mapped = __jsLineToPseudo(jsLine);
+
     const srcText = (__SRC_LINES && __SRC_LINES[srcLine-1]!==undefined) ? __SRC_LINES[srcLine-1] : '';
     self.postMessage({type:'error', line: srcLine, message: err.message, sourceLine: srcText});
   }

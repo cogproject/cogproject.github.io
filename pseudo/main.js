@@ -255,6 +255,8 @@ function resetInput(){
           // 型指定なし: そのまま名前を使用
           const name = p.split(/\s+/).pop();
           names.push(name);
+          // 型指定なしでも arguments から値を取得
+          push(`let ${name} = arguments[${names.length-1}];`);
         }
         return names;
       }
