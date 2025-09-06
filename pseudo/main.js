@@ -305,8 +305,7 @@ function resetInput(){
         let m;
   
         // レコード定義開始: 「レコード型 T」または「record type T」
-        m = line.match(/^(?:レコード型|record\s+type)\s+([A-Za-z_][A-Za-z0-9_]*)$/i);
-        if(!inRecord && m){
+        if(!inRecord && (m=line.match(/^(?:レコード型|record\s+type)\s+([A-Za-z_][A-Za-z0-9_]*)$/i))){
           inRecord = true;
           currentRecord = m[1];
           recordDefs[currentRecord] = {fields:{}};
@@ -321,8 +320,7 @@ function resetInput(){
         if(inRecord){ const f=parseFieldKind(line); if(f){ recordDefs[currentRecord].fields[f.name]=f.kind; } continue; }
   
         // 手続き（プロシージャ）開始: 「手続き NAME(...)」または「procedure NAME(...)」
-        m = line.match(/^(?:手続き|procedure)\s+([A-Za-z_][A-Za-z0-9_]*)\s*\((.*)\)\s*$/i);
-        if(m){
+        if(m = line.match(/^(?:手続き|procedure)\s+([A-Za-z_][A-Za-z0-9_]*)\s*\((.*)\)\s*$/i)){
           const name = m[1];
           const paramStr = m[2];
           push(`function ${name}(){`);
@@ -336,20 +334,17 @@ function resetInput(){
         }
   
         // 反復(cond)
-        m = line.match(/^反復\s*\((.*)\)\s*$/);
-        if(m){ push(`while(${convertExpr(m[1])}){`); continue; }
+        if(m=line.match(/^反復\s*\((.*)\)\s*$/)){ push(`while(${convertExpr(m[1])}){`); continue; }
         if(/^反復終わり\s*$/.test(line)){ push('}'); continue; }
   
         // do … until / repeat … until
         if(/^do\s*$/i.test(line)){ push('do{'); continue; }
         if(/^repeat\s*$/i.test(line)){ push('do{'); continue; }
-        m = line.match(/^until\s*\((.*)\)\s*$/i);
-        if(m){ push(`} while(!(${convertExpr(m[1])}));`); continue; }
+        if(m=line.match(/^until\s*\((.*)\)\s*$/i)){ push(`} while(!(${convertExpr(m[1])}));`); continue; }
   
         // 宣言: 日本語・英語両対応の型宣言 (例: 整数型: x, int: y, integer array: arr[])
         // 型名の部分には空白が含まれる場合があるため、コロンまでをまとめて取得する。
-        m = line.match(/^([^:]+)\s*:\s*(.+)$/);
-        if(m){
+        if(m = line.match(/^([^:]+)\s*:\s*(.+)$/)){
           // 型名をトリムし、小文字化。内部では単語間の複数スペースを1つに揃える。
           const rawType = m[1].trim();
           const tKey = rawType.toLowerCase().replace(/\s+/g, ' ');
@@ -360,8 +355,7 @@ function resetInput(){
           }
         }
         // ポインタ宣言: 「型 ポインタ 変数」または「型 pointer 変数」。型は複数語でもよい。
-        m = line.match(/^(.*?)\s*(?:ポインタ|pointer)\s*([A-Za-z_][A-Za-z0-9_]*)$/i);
-        if(m){
+        if(m = line.match(/^(.*?)\s*(?:ポインタ|pointer)\s*([A-Za-z_][A-Za-z0-9_]*)$/i)){
           const rawType = m[1].trim();
           const T = rawType;
           const v = m[2];
@@ -371,8 +365,7 @@ function resetInput(){
         }
 
         // 入力: 日本語「入力(...)」または英語「input(...)」
-        m = line.match(/^(?:入力|input)\s*\((.*)\)\s*$/i);
-        if(m){
+        if(m = line.match(/^(?:入力|input)\s*\((.*)\)\s*$/i)){
           const vars = m[1].split(',').map(s=>s.trim()).filter(Boolean);
           const sarr = '[' + vars.map(v=>`"${v}"`).join(', ') + ']';
           const tmp = `__tmp_in_${tmpCounter++}`;
@@ -384,8 +377,7 @@ function resetInput(){
         }
 
         // 出力・改行: 日本語「出力」「改行」、英語「output」「newline」
-        m = line.match(/^(?:出力|output)\s*\((.*)\)\s*$/i);
-        if(m){
+        if(m = line.match(/^(?:出力|output)\s*\((.*)\)\s*$/i)){
           push(`__出力(${convertExpr(m[1])});`);
           continue;
         }
@@ -395,15 +387,12 @@ function resetInput(){
         }
   
         // 条件/ループ
-        m = line.match(/^if\s*\((.*)\)\s*$/i);
-        if(m){ push(`if(${convertExpr(m[1])}){`); continue; }
-        m = line.match(/^elseif\s*\((.*)\)\s*$/i);
-        if(m){ push(`} else if(${convertExpr(m[1])}){`); continue; }
+        if(m=line.match(/^if\s*\((.*)\)\s*$/i)){ push(`if(${convertExpr(m[1])}){`); continue; }
+        if(m=line.match(/^elseif\s*\((.*)\)\s*$/i)){ push(`} else if(${convertExpr(m[1])}){`); continue; }
         if(/^else\s*$/i.test(line)){ push('} else {'); continue; }
         if(/^endif\s*$/i.test(line)){ push('}'); continue; }
   
-        m = line.match(/^for\s*\(([^;]+);([^;]+);\s*([^)]+)\)\s*$/i);
-        if(m){
+        if(m=line.match(/^for\s*\(([^;]+);([^;]+);\s*([^)]+)\)\s*$/i)){
           const init=convertExpr(m[1]).replace(/←/g,'=');
           const cond=convertExpr(m[2]);
           const step=convertExpr(m[3]).replace(/←/g,'=');
@@ -411,8 +400,7 @@ function resetInput(){
         }
         if(/^endfor\s*$/i.test(line)){ push('}'); continue; }
   
-        m = line.match(/^while\s*\((.*)\)\s*$/i);
-        if(m){ push(`while(${convertExpr(m[1])}){`); continue; }
+        if(m=line.match(/^while\s*\((.*)\)\s*$/i)){ push(`while(${convertExpr(m[1])}){`); continue; }
         if(/^endwhile\s*$/i.test(line)){ push('}'); continue; }
   
         // 1行に複数文（; 区切り）— forヘッダ以外
