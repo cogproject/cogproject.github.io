@@ -456,8 +456,7 @@ self.onmessage = function(e){
     if (Number.isInteger(jsLine) && jsLine > 0) {
       let mapped = __jsLineToPseudo(jsLine - offset);
       if (!mapped) mapped = __jsLineToPseudo(jsLine);
-      if (mapped) srcLine = mapped;
-    }
+
     const srcText = (__SRC_LINES && __SRC_LINES[srcLine-1]!==undefined) ? __SRC_LINES[srcLine-1] : '';
     self.postMessage({type:'error', line: srcLine, message: err.message, sourceLine: srcText});
   }
