@@ -411,17 +411,13 @@ function resetInput(tokens){ inputTokens = (tokens || []).slice(); }
       // MAIN 自動実行
       let curBak=curLine; curLine=0; push(`if (typeof MAIN === 'function'){ MAIN(); }`); curLine=curBak;
   
-      // マッピング公開
+      // マッピング公開と生成JSの保持
       __LINE_MAP = map;
-  
- 
-// マッピング公開と生成JSの保持（★追加）
-__LINE_MAP = map;
-const joined = out.join('\n');
-__LAST_JS = joined;
+      const joined = out.join('\n');
+      __LAST_JS = joined;
 
-// 連結して返す
-return joined;
+      // 連結して返す
+      return joined;
     }
   
     // ========= 実行器（構文/実行時の行番号を逆引き） =========
@@ -456,7 +452,8 @@ self.onmessage = function(e){
     if (Number.isInteger(jsLine) && jsLine > 0) {
       let mapped = __jsLineToPseudo(jsLine - offset);
       if (!mapped) mapped = __jsLineToPseudo(jsLine);
-
+      if (mapped) srcLine = mapped;
+    }
     const srcText = (__SRC_LINES && __SRC_LINES[srcLine-1]!==undefined) ? __SRC_LINES[srcLine-1] : '';
     self.postMessage({type:'error', line: srcLine, message: err.message, sourceLine: srcText});
   }

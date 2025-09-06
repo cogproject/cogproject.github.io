@@ -417,17 +417,13 @@ function resetInput(){
       // MAIN 自動実行
       let curBak=curLine; curLine=0; push(`if (typeof MAIN === 'function'){ MAIN(); }`); curLine=curBak;
   
-      // マッピング公開
+      // マッピング公開と生成JSの保持
       window.__LINE_MAP = map;
-  
- 
-// マッピング公開と生成JSの保持（★追加）
-window.__LINE_MAP = map;
-const joined = out.join('\n');
-window.__LAST_JS = joined;
+      const joined = out.join('\n');
+      window.__LAST_JS = joined;
 
-// 連結して返す
-return joined;
+      // 連結して返す
+      return joined;
     }
   
     // ========= 実行器（構文/実行時の行番号を逆引き） =========
@@ -828,7 +824,7 @@ A ← [10, 7, 8, 9, 1, 5]
         // Lomuto 方式
         pivot ← A[r]
         i ← l - 1
-        for (j ← l; j <= r - 1; j ← j + 1)
+        for (j ← l; j < r; j ← j + 1)
             if (A[j] <= pivot)
                 i ← i + 1
                 tmp ← A[i]; A[i] ← A[j]; A[j] ← tmp
