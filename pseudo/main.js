@@ -955,7 +955,8 @@ A ← [10, 7, 8, 9, 1, 5]
 
     // エディタ内に HTML タグが入り込んだ場合に除去する
     function sanitizeCode(){
-      const cleaned = codeArea.value.replace(/<[^>]*>/g, '');
+      // Remove HTML tags while preserving comparison operators like '<' and '>'
+      const cleaned = codeArea.value.replace(/<\/?[A-Za-z][^>]*>/g, '');
       if (cleaned !== codeArea.value) {
         codeArea.value = cleaned;
       }
