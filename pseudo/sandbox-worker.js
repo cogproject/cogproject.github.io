@@ -130,7 +130,8 @@ function resetInput(tokens){ inputTokens = (tokens || []).slice(); }
         .replace(/[＋]/g,'+').replace(/[－]/g,'-').replace(/[×＊]/g,'*').replace(/[÷／]/g,'/')
         .replace(/[「]/g,'"').replace(/[」]/g,'"')
         .replace(/[　]/g,' ').replace(/\t/g,'  ').replace(/[\u00A0]/g,' ')
-        .replace(/\s+$/gm,'');
+        // preserve blank lines by trimming only spaces and tabs at line ends
+        .replace(/[ \t]+$/gm,'');
     }
     function convertExpr(expr){
       return expr
@@ -452,7 +453,7 @@ self.onmessage = function(e){
     if (Number.isInteger(jsLine) && jsLine > 0) {
       let mapped = __jsLineToPseudo(jsLine - offset);
       if (!mapped) mapped = __jsLineToPseudo(jsLine);
-      if (mapped) srcLine = mapped;
+      if (mapped && !srcLine) srcLine = mapped;
     }
     const srcText = (__SRC_LINES && __SRC_LINES[srcLine-1]!==undefined) ? __SRC_LINES[srcLine-1] : '';
     self.postMessage({type:'error', line: srcLine, message: err.message, sourceLine: srcText});
