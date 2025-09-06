@@ -24,24 +24,12 @@
     min-width:3.5ch; white-space:pre; font-family: inherit; font-size:14px; line-height:1.45;
   }
   #codeWrap { position:relative; flex:1 1 auto; height:100%; }
-  #highlight {
-    position:absolute; inset:0; margin:0; padding:12px; overflow:auto;
-    white-space:pre; pointer-events:none; color:#e9f1ff;
-    user-select:none;
-    font-family: inherit; font-size:14px; line-height:1.45;
-    z-index:0;
-  }
   #code {
     position:absolute; inset:0; padding:12px; border:0; outline:none; resize:none;
-    background:transparent; color:transparent; caret-color:#e9f1ff;
+    background:#0e1630; color:#e9f1ff; caret-color:#e9f1ff;
     line-height:1.45; overflow:auto; height:100%;
-    z-index:1;
   }
   #code::placeholder { color:#556; }
-  .kw { color:#4ea1ff; }
-  .comment { color:#4cb870; }
-  .op { color:#ff6b6b; }
-  .fn { color:#c77dff; }
 
   .row { display:flex; gap:8px; padding:10px; align-items:center; flex-wrap:wrap; }
   .row .grow { flex:1 1 auto; }
@@ -96,7 +84,6 @@
     <div id="editorWrap">
       <div id="lineNumbers"></div>
       <div id="codeWrap">
-        <pre id="highlight"></pre>
         <textarea id="code" spellcheck="false" placeholder="ここに疑似言語を書きます…"></textarea>
       </div>
     </div>
