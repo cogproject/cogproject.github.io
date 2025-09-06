@@ -260,7 +260,12 @@ function resetInput(tokens){ inputTokens = (tokens || []).slice(); }
           const p = s.split('←');
           const lhs = p[0].trim();
           const rhs = convertExpr(p.slice(1).join('←'));
-          push(`${lhs} = ${rhs};`);
+          const lowerLhs = lhs.toLowerCase();
+          if(lhs === '戻り値' || lowerLhs === 'return value' || lowerLhs === 'returnvalue' || lowerLhs === 'return'){
+            push(`return ${rhs};`);
+          } else {
+            push(`${lhs} = ${rhs};`);
+          }
           return;
         }
         // 単一 '=' を代入とみなす（比較演算子を除外）
