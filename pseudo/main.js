@@ -417,17 +417,13 @@ function resetInput(){
       // MAIN 自動実行
       let curBak=curLine; curLine=0; push(`if (typeof MAIN === 'function'){ MAIN(); }`); curLine=curBak;
   
-      // マッピング公開
+      // マッピング公開と生成JSの保持
       window.__LINE_MAP = map;
-  
- 
-// マッピング公開と生成JSの保持（★追加）
-window.__LINE_MAP = map;
-const joined = out.join('\n');
-window.__LAST_JS = joined;
+      const joined = out.join('\n');
+      window.__LAST_JS = joined;
 
-// 連結して返す
-return joined;
+      // 連結して返す
+      return joined;
     }
   
     // ========= 実行器（構文/実行時の行番号を逆引き） =========
