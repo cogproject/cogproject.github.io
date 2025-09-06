@@ -968,14 +968,39 @@ A ← [10, 7, 8, 9, 1, 5]
     // ========= UI =========
     const codeArea = $('#code');
     const lineNumbers = $('#lineNumbers');
+    const highlightArea = $('#highlight');
     const exampleSelect = $('#exampleSelect');
+
+    const KEYWORDS = new Set([
+      'if','elseif','else','endif','for','endfor','while','endwhile','repeat','until',
+      '反復','反復終わり','レコード型','レコード型終わり','ポインタ','新規','NIL',
+      '手続き','手続き終わり','MAIN','入力','出力','改行',
+      '整数型','実数型','文字列型','真偽値'
+    ]);
+
+    function escapeHtml(str){ return str.replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+
+    function highlightCode(){
+      const commentRegex=/\/\/.*$/gm;
+      const comments=[];
+      let tmp=codeArea.value.replace(commentRegex,m=>{ comments.push(m); return `\u0000${comments.length-1}\u0000`; });
+      tmp=escapeHtml(tmp);
+      const kwRegex=new RegExp('\\b(' + Array.from(KEYWORDS).join('|') + ')\\b','g');
+      tmp=tmp.replace(kwRegex,'<span class="kw">$1</span>');
+      tmp=tmp.replace(/([+\\-*/<>=!]|←)/g,'<span class="op">$1</span>');
+      tmp=tmp.replace(/\\b([A-Za-z_][A-Za-z0-9_]*|[\\u3040-\\u30ff\\u4e00-\\u9faf]+)(?=\\()/g,(m)=>{
+        return KEYWORDS.has(m)?m:`<span class="fn">${m}</span>`;
+      });
+      tmp=tmp.replace(/\\u0000(\\d+)\\u0000/g,(_,i)=>`<span class="comment">${escapeHtml(comments[+i])}</span>`);
+      highlightArea.innerHTML=tmp;
+    }
   
     function updateLineNumbers(){
       const lines = codeArea.value.split('\n').length || 1;
       let buf = '1'; for(let i=2;i<=lines;i++){ buf += '\n' + i; }
       lineNumbers.textContent = buf;
     }
-    function insertExample(){ const key=exampleSelect.value; const demo=getExample(key); codeArea.value=demo; updateLineNumbers(); }
+    function insertExample(){ const key=exampleSelect.value; const demo=getExample(key); codeArea.value=demo; updateLineNumbers(); highlightCode(); }
   
     document.getElementById('btnRun').addEventListener('click', run);
     document.getElementById('btnClearOut').addEventListener('click', clearOutput);
@@ -991,9 +1016,10 @@ A ← [10, 7, 8, 9, 1, 5]
     //document.getElementById('btnExample').addEventListener('click', insertExample);
     exampleSelect.addEventListener('change', insertExample);
     document.addEventListener('keydown', (e)=>{ if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){ run(); } });
-    codeArea.addEventListener('input', updateLineNumbers);
-    codeArea.addEventListener('scroll', ()=>{ lineNumbers.scrollTop = codeArea.scrollTop; });
+    codeArea.addEventListener('input', ()=>{ updateLineNumbers(); highlightCode(); });
+    codeArea.addEventListener('scroll', ()=>{ lineNumbers.scrollTop = codeArea.scrollTop; highlightArea.scrollTop = codeArea.scrollTop; });
   
       // 初期は単方向リスト
       insertExample();
+      highlightCode();
       updateAd();
