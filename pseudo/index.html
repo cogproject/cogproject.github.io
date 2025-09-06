@@ -23,10 +23,22 @@
     user-select:none; overflow:hidden; border-right:1px solid #1f294a;
     min-width:3.5ch; white-space:pre; font-family: inherit; font-size:14px; line-height:1.45;
   }
-  #code {
-    flex:1 1 auto; padding:12px; color:#e9f1ff; background:#0e1630;
-    border:0; outline:none; resize:none; line-height:1.45; overflow:auto; height:100%;
+  #codeWrap { position:relative; flex:1 1 auto; height:100%; }
+  #highlight {
+    position:absolute; inset:0; margin:0; padding:12px; overflow:auto;
+    white-space:pre; pointer-events:none; color:#e9f1ff;
+    font-family: inherit; font-size:14px; line-height:1.45;
   }
+  #code {
+    position:absolute; inset:0; padding:12px; border:0; outline:none; resize:none;
+    background:transparent; color:transparent; caret-color:#e9f1ff;
+    line-height:1.45; overflow:auto; height:100%;
+  }
+  #code::placeholder { color:#556; }
+  .kw { color:#4ea1ff; }
+  .comment { color:#4cb870; }
+  .op { color:#ff6b6b; }
+  .fn { color:#c77dff; }
 
   .row { display:flex; gap:8px; padding:10px; align-items:center; flex-wrap:wrap; }
   .row .grow { flex:1 1 auto; }
@@ -138,7 +150,10 @@
 57
 58
 59</div>
-      <textarea id="code" spellcheck="false" placeholder="ここに疑似言語を書きます…"></textarea>
+      <div id="codeWrap">
+        <pre id="highlight"></pre>
+        <textarea id="code" spellcheck="false" placeholder="ここに疑似言語を書きます…"></textarea>
+      </div>
     </div>
 
     <div class="footer small">
