@@ -980,8 +980,9 @@ A ← [10, 7, 8, 9, 1, 5]
     }
   
     function updateLineNumbers(){
-      const lines = codeArea.value.split('\n').length || 1;
-      let buf = '1'; for(let i=2;i<=lines;i++){ buf += '\n' + i; }
+      const lines = Math.max(codeArea.value.split('\n').length, 1);
+      let buf = '';
+      for(let i=1;i<=lines;i++){ buf += (i===1?'':'\n') + i; }
       lineNumbers.textContent = buf;
     }
     function insertExample(){ const key=exampleSelect.value; const demo=getExample(key); codeArea.value=demo; updateLineNumbers(); highlightCode(); }
@@ -1000,6 +1001,13 @@ A ← [10, 7, 8, 9, 1, 5]
     //document.getElementById('btnExample').addEventListener('click', insertExample);
     exampleSelect.addEventListener('change', insertExample);
     document.addEventListener('keydown', (e)=>{ if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){ run(); } });
+    codeArea.addEventListener('copy', (e)=>{
+      const start = codeArea.selectionStart;
+      const end = codeArea.selectionEnd;
+      const text = codeArea.value.substring(start, end);
+      e.clipboardData.setData('text/plain', text);
+      e.preventDefault();
+    });
     codeArea.addEventListener('input', ()=>{ updateLineNumbers(); highlightCode(); });
     codeArea.addEventListener('scroll', ()=>{ lineNumbers.scrollTop = codeArea.scrollTop; highlightArea.scrollTop = codeArea.scrollTop; });
   
