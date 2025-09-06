@@ -130,7 +130,8 @@ function resetInput(tokens){ inputTokens = (tokens || []).slice(); }
         .replace(/[＋]/g,'+').replace(/[－]/g,'-').replace(/[×＊]/g,'*').replace(/[÷／]/g,'/')
         .replace(/[「]/g,'"').replace(/[」]/g,'"')
         .replace(/[　]/g,' ').replace(/\t/g,'  ').replace(/[\u00A0]/g,' ')
-        .replace(/\s+$/gm,'');
+        // preserve blank lines by trimming only spaces and tabs at line ends
+        .replace(/[ \t]+$/gm,'');
     }
     function convertExpr(expr){
       return expr
