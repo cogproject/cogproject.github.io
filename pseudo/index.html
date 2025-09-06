@@ -28,11 +28,17 @@
     position:absolute; inset:0; margin:0; padding:12px; overflow:auto;
     white-space:pre; pointer-events:none; color:#e9f1ff;
     font-family: inherit; font-size:14px; line-height:1.45;
+    z-index:0;
+  }
+  #highlight, #highlight * {
+    user-select: none;
+    pointer-events: none;
   }
   #code {
     position:absolute; inset:0; padding:12px; border:0; outline:none; resize:none;
     background:transparent; color:transparent; caret-color:#e9f1ff;
     line-height:1.45; overflow:auto; height:100%;
+    z-index:1;
   }
   #code::placeholder { color:#556; }
   .kw { color:#4ea1ff; }
@@ -91,65 +97,7 @@
 
     <!-- 行番号付きエディタ -->
     <div id="editorWrap">
-      <div id="lineNumbers">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48
-49
-50
-51
-52
-53
-54
-55
-56
-57
-58
-59</div>
+      <div id="lineNumbers"></div>
       <div id="codeWrap">
         <pre id="highlight"></pre>
         <textarea id="code" spellcheck="false" placeholder="ここに疑似言語を書きます…"></textarea>
