@@ -437,13 +437,16 @@ self.onmessage = function(e){
     let srcLine = __LINE__ || 0;
     const stack = String(err && err.stack || '');
     let jsLine = null;
-    let m = stack.match(/worker_pseudo\.js:(\d+):\d+/) || stack.match(/\(worker_pseudo\.js:(\d+):\d+\)/) || stack.match(/<anonymous>:(\d+):\d+/);
+    let m = stack.match(/worker_pseudo\.js:(\d+):\d+/)
+      || stack.match(/\(worker_pseudo\.js:(\d+):\d+\)/)
+      || stack.match(/<anonymous>:(\d+):\d+/)
+      || stack.match(/\[eval\]:(\d+):\d+/);
     if (m) jsLine = parseInt(m[1], 10);
     if (!jsLine && (err.lineNumber || err.line)) {
       jsLine = parseInt(err.lineNumber || err.line, 10);
     }
     if (Number.isInteger(jsLine) && jsLine > 0) {
-      const mapped = __jsLineToPseudo(jsLine);
+      const mapped = __jsLineToPseudo(jsLine - 1);
       if (mapped) srcLine = mapped;
     }
     const srcText = (__SRC_LINES && __SRC_LINES[srcLine-1]!==undefined) ? __SRC_LINES[srcLine-1] : '';
