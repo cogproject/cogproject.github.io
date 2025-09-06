@@ -136,7 +136,8 @@ function resetInput(){
         .replace(/[＋]/g,'+').replace(/[－]/g,'-').replace(/[×＊]/g,'*').replace(/[÷／]/g,'/')
         .replace(/[「]/g,'"').replace(/[」]/g,'"')
         .replace(/[　]/g,' ').replace(/\t/g,'  ').replace(/[\u00A0]/g,' ')
-        .replace(/\s+$/gm,'');
+        // preserve blank lines by trimming only spaces and tabs at line ends
+        .replace(/[ \t]+$/gm,'');
     }
     function convertExpr(expr){
       return expr
@@ -295,6 +296,12 @@ function resetInput(){
         let raw=lines[i];
         const cpos=raw.indexOf('//'); if(cpos!==-1) raw=raw.slice(0,cpos);
         const line=raw.trim();
+        const parenCheck = raw.replace(/".*?"|'.*?'/g,'');
+        let bal=0; let bad=false;
+        for(const ch of parenCheck){
+          if(ch==='(') bal++; else if(ch===')'){ if(bal) bal--; else { bad=true; break; } }
+        }
+        if(bal>0 || bad){ const e=new Error(bad? 'unexpected )' : 'missing ) after argument list'); e.line=curLine; throw e; }
   
         // 空行/コメント行：マークだけ（JS 1行、map 1件）
         if(!line){ out.push(`__mark(${curLine});`); map.push(curLine); continue; }
