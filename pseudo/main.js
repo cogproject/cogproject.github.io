@@ -81,9 +81,12 @@ function __jsLineToPseudo(jsLine){
       const stdout = $('#stdout');
       const adArea = $('#adArea');
       const ADS = [
+        '',
+        ''
+      ];
         //'ITパスポートレベルのあなたでも安心！<br><a href="https://example.com/start" target="_blank" rel="noopener" style="color:#8ad;">無料体験はこちら</a>',
         //'ブラウザだけで学べる入門講座<br><a href="https://example.com/start" target="_blank" rel="noopener" style="color:#8ad;">今すぐチャレンジ</a>'
-      ];
+
       function updateAd(){ if(adArea){ const idx=Math.floor(Math.random()*ADS.length); adArea.innerHTML=ADS[idx]; } }
     function clearOutput(){ stdout.textContent = ''; }
     function printLine(s=''){ stdout.textContent += s + "\n"; }
