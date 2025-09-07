@@ -8,6 +8,8 @@
     body { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; background:#0b1020; color:#eef; padding:20px; line-height:1.6; }
     h1, h2 { color:#8ad; }
     code { background:#0a1230; border:1px solid #2a3766; padding:2px 4px; border-radius:4px; }
+    pre { background:#0a1230; border:1px solid #2a3766; padding:8px; border-radius:4px; overflow-x:auto; }
+    pre code { background:transparent; border:0; padding:0; }
     a { color:#8ad; }
   </style>
 </head>
@@ -43,6 +45,253 @@
   </ul>
 
   <p>エラーが発生した場合は、行番号と該当行が表示されます。詳しくはインタープリターのソースコードを参照してください。</p>
+  <h2>データ構造とアルゴリズムの例</h2>
+  <p>以下は、インタプリタで動かせるサンプルです。コピーして <a href="index.html">インタープリター</a> に貼り付けてみましょう。</p>
+
+  <h3>配列の合計</h3>
+  <p>配列の中の数字をすべて足し合わせます。</p>
+  <pre><code>整数型: A{}
+A ← {3, 1, 4}
+
+手続き MAIN()
+    整数型: i, sum
+    sum ← 0
+    for (i ← 0; i &lt; A.length; i ← i + 1)
+        sum ← sum + A[i]
+    endfor
+    出力(&quot;合計は&quot;, sum)
+手続き終わり
+</code></pre>
+
+  <h3>単方向リスト</h3>
+  <p>先頭に数字を追加してから順番に表示します。</p>
+  <pre><code>レコード型 Node
+    整数型 data
+    Node ポインタ next
+レコード型終わり
+
+Node ポインタ head
+
+手続き ADD_FIRST(整数型 x)
+    Node ポインタ n
+    n ← 新規 Node
+    n.data ← x
+    n.next ← head
+    head ← n
+手続き終わり
+
+手続き PRINT_LIST()
+    Node ポインタ p
+    p ← head
+    反復 (p != NIL)
+        出力(p.data)
+        p ← p.next
+    反復終わり
+手続き終わり
+
+手続き MAIN()
+    head ← NIL
+    ADD_FIRST(3)
+    ADD_FIRST(5)
+    ADD_FIRST(7)
+    PRINT_LIST()
+手続き終わり
+</code></pre>
+
+  <h3>スタック</h3>
+  <p>後入れ先出しの入れ物です。最後に入れたものから取り出します。</p>
+  <pre><code>整数型: stack{}
+整数型: top
+
+手続き PUSH(整数型 x)
+    top ← top + 1
+    stack[top] ← x
+手続き終わり
+
+手続き POP()
+    if (top &lt; 0)
+        出力(&quot;空です&quot;)
+    else
+        出力(stack[top])
+        top ← top - 1
+    endif
+手続き終わり
+
+手続き MAIN()
+    top ← -1
+    PUSH(10)
+    PUSH(20)
+    POP()
+    POP()
+    POP()
+手続き終わり
+</code></pre>
+
+  <h3>キュー</h3>
+  <p>先入れ先出しの入れ物です。入れた順に取り出します。</p>
+  <pre><code>整数型: Q{}
+整数型: front, rear
+
+手続き ENQUEUE(整数型 x)
+    Q[rear] ← x
+    rear ← rear + 1
+手続き終わり
+
+手続き DEQUEUE()
+    if (front == rear)
+        出力(&quot;空です&quot;)
+    else
+        出力(Q[front])
+        front ← front + 1
+    endif
+手続き終わり
+
+手続き MAIN()
+    front ← 0; rear ← 0
+    ENQUEUE(1)
+    ENQUEUE(2)
+    DEQUEUE()
+    DEQUEUE()
+    DEQUEUE()
+手続き終わり
+</code></pre>
+
+  <h3>線形探索</h3>
+  <p>配列を先頭から順に調べて値を探します。</p>
+  <pre><code>整数型: A{}
+A ← {3, 8, 2, 7}
+整数型: i, target
+真偽値: found
+
+target ← 7
+found ← 偽
+for (i ← 0; i &lt; A.length; i ← i + 1)
+    if (A[i] == target)
+        出力(&quot;見つかった&quot;)
+        found ← 真
+    endif
+endfor
+if (found == 偽)
+    出力(&quot;見つからない&quot;)
+endif
+</code></pre>
+
+  <h3>二分探索</h3>
+  <p>並んでいる配列を半分ずつ調べて値を探します。</p>
+  <pre><code>整数型: A{}
+A ← {1, 3, 5, 7, 9}
+整数型: left, right, mid, target
+真偽値: found
+
+target ← 7
+left ← 0
+right ← A.length - 1
+found ← 偽
+while (left &lt;= right &amp;&amp; found == 偽)
+    mid ← Math.floor((left + right) / 2)
+    if (A[mid] == target)
+        found ← 真
+    elseif (A[mid] &gt; target)
+        right ← mid - 1
+    else
+        left ← mid + 1
+    endif
+endwhile
+if (found)
+    出力(&quot;見つかった&quot;)
+else
+    出力(&quot;見つからない&quot;)
+endif
+</code></pre>
+
+  <h3>階乗</h3>
+  <p>1 から n まで掛け合わせる計算です。</p>
+  <pre><code>手続き FACT(整数型 n)
+    整数型: i, ans
+    ans ← 1
+    for (i ← 1; i &lt;= n; i ← i + 1)
+        ans ← ans * i
+    endfor
+    出力(ans)
+手続き終わり
+
+手続き MAIN()
+    FACT(5)
+手続き終わり
+</code></pre>
+
+  <h3>フィボナッチ数列</h3>
+  <p>前の2つを足して次の数を作ります。</p>
+  <pre><code>手続き FIB(整数型 n)
+    整数型: a, b, i, tmp
+    a ← 0; b ← 1
+    for (i ← 0; i &lt; n; i ← i + 1)
+        出力(a)
+        tmp ← a + b
+        a ← b
+        b ← tmp
+    endfor
+手続き終わり
+
+手続き MAIN()
+    FIB(5)
+手続き終わり
+</code></pre>
+
+  <h3>バブルソート</h3>
+  <p>隣同士を比べて並べ替えます。</p>
+  <pre><code>整数型: A{}
+A ← {5, 3, 1, 4, 2}
+整数型: i, j, tmp, n
+
+手続き BUBBLE()
+    n ← A.length
+    for (i ← 0; i &lt; n - 1; i ← i + 1)
+        for (j ← 0; j &lt; n - i - 1; j ← j + 1)
+            if (A[j] &gt; A[j+1])
+                tmp ← A[j]
+                A[j] ← A[j+1]
+                A[j+1] ← tmp
+            endif
+        endfor
+    endfor
+手続き終わり
+
+手続き MAIN()
+    BUBBLE()
+    for (i ← 0; i &lt; A.length; i ← i + 1)
+        出力(A[i])
+    endfor
+手続き終わり
+</code></pre>
+
+  <h3>選択ソート</h3>
+  <p>一番小さい値を順に選んで並べ替えます。</p>
+  <pre><code>整数型: A{}
+A ← {4, 1, 3, 2}
+整数型: i, j, min, tmp
+
+手続き SELECTION()
+    for (i ← 0; i &lt; A.length - 1; i ← i + 1)
+        min ← i
+        for (j ← i + 1; j &lt; A.length; j ← j + 1)
+            if (A[j] &lt; A[min])
+                min ← j
+            endif
+        endfor
+        tmp ← A[i]
+        A[i] ← A[min]
+        A[min] ← tmp
+    endfor
+手続き終わり
+
+手続き MAIN()
+    SELECTION()
+    for (i ← 0; i &lt; A.length; i ← i + 1)
+        出力(A[i])
+    endfor
+手続き終わり
+</code></pre>
 
   <p><a href="index.html">インタープリターへ戻る</a></p>
 </body>
