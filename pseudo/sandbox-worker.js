@@ -334,16 +334,16 @@ function resetInput(tokens){ inputTokens = (tokens || []).slice(); }
         }
         if(inRecord){ const f=parseFieldKind(line); if(f){ recordDefs[currentRecord].fields[f.name]=f.kind; } continue; }
   
-        // 手続き（プロシージャ）開始: 「手続き NAME(...)」または「procedure NAME(...)」
-        if(m = line.match(/^(?:手続き|procedure)\s+([A-Za-z_][A-Za-z0-9_]*)\s*\((.*)\)\s*$/i)){
+        // 手続き/関数開始: 「手続き NAME(...)」「procedure NAME(...)」「関数 NAME(...)」または「function NAME(... )」
+        if(m = line.match(/^(?:手続き|procedure|関数|function)\s+([A-Za-z_][A-Za-z0-9_]*)\s*\((.*)\)\s*$/i)){
           const name = m[1];
           const paramStr = m[2];
           push(`function ${name}(){`);
           parseProcParams(paramStr);
           continue;
         }
-        // 手続き（プロシージャ）終了: 「手続き終わり」または「end procedure」
-        if(/^(?:手続き終わり|end\s*procedure)\s*$/i.test(line)){
+        // 手続き/関数終了: 「手続き終わり」「関数終わり」または「end procedure/end function」
+        if(/^(?:手続き終わり|関数終わり|end\s*(?:procedure|function))\s*$/i.test(line)){
           push('}');
           continue;
         }
