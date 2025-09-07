@@ -133,8 +133,25 @@ function resetInput(tokens){ inputTokens = (tokens || []).slice(); }
         // preserve blank lines by trimming only spaces and tabs at line ends
         .replace(/[ \t]+$/gm,'');
     }
+    function bracesToBrackets(s){
+      let out='', inStr=false, quote='';
+      for(let i=0;i<s.length;i++){
+        const ch=s[i];
+        if(inStr){
+          if(ch==='\\' && i+1<s.length){ out+=ch+s[++i]; continue; }
+          if(ch===quote) inStr=false;
+          out+=ch;
+        } else {
+          if(ch==='"'||ch==="'"){ inStr=true; quote=ch; out+=ch; }
+          else if(ch==='{') out+='[';
+          else if(ch==='}') out+=']';
+          else out+=ch;
+        }
+      }
+      return out;
+    }
     function convertExpr(expr){
-      return expr
+      return bracesToBrackets(expr)
         // プレースホルダで "真偽値" を保護
         .replace(/真偽値/g,'__TOKEN_BOOLTYPE__')
         // 日本語の論理演算子
@@ -211,7 +228,7 @@ function resetInput(tokens){ inputTokens = (tokens || []).slice(); }
           if(kind==='実数型'){jsInit='0';t='float';}
           if(kind==='文字列型'){jsInit='""';t='string';}
           if(kind==='真偽値'){jsInit='false';t='bool';}
-          if(n.endsWith('[]')){ const base=n.slice(0,-2).trim(); push(`let ${base} = [];`); types[base]=t+'_array'; }
+          if(n.endsWith('{}')){ const base=n.slice(0,-2).trim(); push(`let ${base} = [];`); types[base]=t+'_array'; }
           else { push(`let ${n} = ${jsInit};`); types[n]=t; }
         }
       }
@@ -340,7 +357,7 @@ function resetInput(tokens){ inputTokens = (tokens || []).slice(); }
         if(/^repeat\s*$/i.test(line)){ push('do{'); continue; }
         if(m=line.match(/^until\s*\((.*)\)\s*$/i)){ push(`} while(!(${convertExpr(m[1])}));`); continue; }
   
-        // 宣言: 日本語・英語両対応の型宣言 (例: 整数型: x, int: y, integer array: arr[])
+        // 宣言: 日本語・英語両対応の型宣言 (例: 整数型: x, int: y, integer array: arr{})
         // 型名の部分には空白が含まれる場合があるため、コロンまでをまとめて取得する。
         if(m = line.match(/^([^:]+)\s*:\s*(.+)$/)){
           // 型名をトリムし、小文字化。内部では単語間の複数スペースを1つに揃える。

@@ -139,8 +139,25 @@ function resetInput(){
         // preserve blank lines by trimming only spaces and tabs at line ends
         .replace(/[ \t]+$/gm,'');
     }
+    function bracesToBrackets(s){
+      let out='', inStr=false, quote='';
+      for(let i=0;i<s.length;i++){
+        const ch=s[i];
+        if(inStr){
+          if(ch==='\\' && i+1<s.length){ out+=ch+s[++i]; continue; }
+          if(ch===quote) inStr=false;
+          out+=ch;
+        } else {
+          if(ch==='"'||ch==="'"){ inStr=true; quote=ch; out+=ch; }
+          else if(ch==='{') out+='[';
+          else if(ch==='}') out+=']';
+          else out+=ch;
+        }
+      }
+      return out;
+    }
     function convertExpr(expr){
-      return expr
+      return bracesToBrackets(expr)
         // プレースホルダで "真偽値" を保護
         .replace(/真偽値/g,'__TOKEN_BOOLTYPE__')
         // 日本語の論理演算子
@@ -217,7 +234,7 @@ function resetInput(){
           if(kind==='実数型'){jsInit='0';t='float';}
           if(kind==='文字列型'){jsInit='""';t='string';}
           if(kind==='真偽値'){jsInit='false';t='bool';}
-          if(n.endsWith('[]')){ const base=n.slice(0,-2).trim(); push(`let ${base} = [];`); types[base]=t+'_array'; }
+          if(n.endsWith('{}')){ const base=n.slice(0,-2).trim(); push(`let ${base} = [];`); types[base]=t+'_array'; }
           else { push(`let ${n} = ${jsInit};`); types[n]=t; }
         }
       }
@@ -346,7 +363,7 @@ function resetInput(){
         if(/^repeat\s*$/i.test(line)){ push('do{'); continue; }
         if(m=line.match(/^until\s*\((.*)\)\s*$/i)){ push(`} while(!(${convertExpr(m[1])}));`); continue; }
   
-        // 宣言: 日本語・英語両対応の型宣言 (例: 整数型: x, int: y, integer array: arr[])
+        // 宣言: 日本語・英語両対応の型宣言 (例: 整数型: x, int: y, integer array: arr{})
         // 型名の部分には空白が含まれる場合があるため、コロンまでをまとめて取得する。
         if(m = line.match(/^([^:]+)\s*:\s*(.+)$/)){
           // 型名をトリムし、小文字化。内部では単語間の複数スペースを1つに揃える。
@@ -465,11 +482,11 @@ function resetInput(){
     function getExample(key){
       // データ構造
       if(key === 'stack') return `// スタック（配列実装・thenなし）
-  整数型: stack[]
+  整数型: stack{}
   整数型: top
   
   手続き INIT_STACK()
-      stack ← []
+      stack ← {}
       top ← -1
   手続き終わり
   
@@ -509,13 +526,13 @@ function resetInput(){
   手続き終わり
   `;
       if(key === 'queue') return `// キュー（配列・循環バッファ）
-  整数型: Q[]
+  整数型: Q{}
   整数型: front, rear, count, CAP
   
   手続き INIT_QUEUE(整数型 cap)
       整数型: i
       CAP ← cap
-      Q ← []
+      Q ← {}
       for (i ← 0; i < CAP; i ← i + 1)
           Q[i] ← 0
       endfor
@@ -549,7 +566,7 @@ function resetInput(){
   手続き PRINTQ()
       整数型: i, idx
       if (count == 0)
-          出力("[]")
+          出力("{}")
       else
           for (i ← 0; i < count; i ← i + 1)
               idx ← (front + i) % CAP
@@ -572,16 +589,16 @@ function resetInput(){
   手続き終わり
   `;
       if(key === 'hashtable') return `// ハッシュテーブル（線形探索・戻り値不使用）
-  文字列型: keys[]
-  整数型: values[]
+  文字列型: keys{}
+  整数型: values{}
   整数型: M
   整数型: lastHash
   
   手続き INIT_HT(整数型 size)
       整数型: i
       M ← size
-      keys ← []
-      values ← []
+      keys ← {}
+      values ← {}
       for (i ← 0; i < M; i ← i + 1)
           keys[i] ← ""
           values[i] ← 0
@@ -688,8 +705,8 @@ function resetInput(){
   手続き終わり
   `;
       if(key === 'arraySum') return `// 配列合計（基本サンプル）
-  整数型: C[]
-  C ← [3, 5, 7, 9, 11]
+  整数型: C{}
+  C ← {3, 5, 7, 9, 11}
   
   整数型: i, sum
   sum ← 0
@@ -705,8 +722,8 @@ function resetInput(){
   
       // ソート
       if(key === 'sortBubble') return `// バブルソート
-  整数型: A[]
-  A ← [5, 3, 8, 4, 2, 7, 1, 6]
+  整数型: A{}
+  A ← {5, 3, 8, 4, 2, 7, 1, 6}
   整数型: n, i, j, tmp
   真偽値: swapped
   
@@ -743,8 +760,8 @@ function resetInput(){
   `;
   
       if(key === 'sortSelection') return `// 選択ソート
-  整数型: A[]
-  A ← [64, 25, 12, 22, 11]
+  整数型: A{}
+  A ← {64, 25, 12, 22, 11}
   整数型: i, j, minIdx, n, tmp
   
   手続き PRINT()
@@ -779,8 +796,8 @@ function resetInput(){
   `;
   
       if(key === 'sortInsertion') return `// 挿入ソート
-  整数型: A[]
-  A ← [9, 5, 1, 4, 3]
+  整数型: A{}
+  A ← {9, 5, 1, 4, 3}
   整数型: i, j, key, n
   
   手続き PRINT()
@@ -813,8 +830,8 @@ function resetInput(){
   `;
   
       if(key === 'sortQuick') return `// クイックソート（再帰）
-  整数型: A[]
-A ← [10, 7, 8, 9, 1, 5]
+  整数型: A{}
+  A ← {10, 7, 8, 9, 1, 5}
 整数型: i, j, pivot, tmp
 
 手続き PRINT()
@@ -855,8 +872,8 @@ A ← [10, 7, 8, 9, 1, 5]
   `;
   
       if(key === 'sortMerge') return `// マージソート（再帰・補助配列使用）
-  整数型: A[]
-  A ← [38, 27, 43, 3, 9, 82, 10]
+  整数型: A{}
+  A ← {38, 27, 43, 3, 9, 82, 10}
   
   手続き PRINT()
       整数型: k
@@ -867,7 +884,7 @@ A ← [10, 7, 8, 9, 1, 5]
   
   手続き MERGE(整数型 l, 整数型 m, 整数型 r)
       整数型: i, j, k, n1, n2
-      整数型: L[], R[]
+      整数型: L{}, R{}
       n1 ← m - l + 1
       n2 ← r - m
       for (i ← 0; i < n1; i ← i + 1)
