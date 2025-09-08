@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Python3インタプリタ（ブラウザ実行）</title>
+  <!-- Prism.js dark theme for syntax highlighting -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" integrity="sha512-VlM7TsFMkCV459pAtZ1rJlop1tgaOSpefdcR0fEu7gvfYifW4UudlGpSMqWoSA39wcnV7B/jOZHYceEAKiU2nA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    :root {
+      /* reuse the dark theme from the pseudo‑language interpreter */
+      --bg: #0b1020;
+      --panel: #121a33;
+      --muted: #9fb0d0;
+      --accent: #8ad;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas,
+        "Liberation Mono", monospace;
+      background: var(--bg);
+      color: #eef;
+    }
+    header {
+      padding: 16px 20px;
+      background: linear-gradient(90deg, #111b38, #101933 60%);
+      border-bottom: 1px solid #223;
+    }
+    h1 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: 0.5px;
+    }
+    main {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 14px;
+      padding: 16px;
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid #1f294a;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+    }
+    .card h2 {
+      margin: 0;
+      padding: 10px 12px;
+      font-size: 14px;
+      background: #101734;
+      border-bottom: 1px solid #1e2748;
+      color: #cfe3ff;
+    }
+    textarea,
+    pre,
+    button,
+    select {
+      font-family: inherit;
+      font-size: 14px;
+    }
+    /* line‑numbered editor */
+    #editorWrap {
+      display: flex;
+      width: 100%;
+      height: 320px;
+      border: 1px solid #1f294a;
+      background: #0e1630;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    #lineNumbers {
+      padding: 12px 8px;
+      background: #101734;
+      color: var(--accent);
+      text-align: right;
+      user-select: none;
+      overflow: hidden;
+      border-right: 1px solid #1f294a;
+      min-width: 3.5ch;
+      white-space: pre;
+      font-family: inherit;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+    /* wrap for code textarea and highlight overlay */
+    #codeWrap {
+      position: relative;
+      flex: 1 1 auto;
+      height: 100%;
+      overflow: hidden;
+    }
+    /* syntax highlight layer; sits beneath the textarea and mirrors its scroll */
+    #highlight {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 12px;
+      pointer-events: none;
+      white-space: pre-wrap;
+      word-break: break-word;
+      overflow: hidden;
+      font-family: inherit;
+      font-size: 14px;
+      line-height: 1.45;
+      z-index: 0;
+    }
+    #code {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 12px;
+      border: 0;
+      outline: none;
+      resize: none;
+      background: transparent;
+      /* hide the raw text but keep caret visible */
+      color: transparent;
+      caret-color: #e9f1ff;
+      font-family: inherit;
+      font-size: 14px;
+      line-height: 1.45;
+      overflow: auto;
+      z-index: 1;
+    }
+    .row {
+      display: flex;
+      gap: 8px;
+      padding: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .muted {
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .btn {
+      appearance: none;
+      border: 1px solid #3a4c80;
+      background: #1a2550;
+      color: #e6eeff;
+      padding: 8px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .btn:hover {
+      filter: brightness(1.1);
+    }
+    .btn:active {
+      transform: translateY(1px);
+    }
+    select {
+      border: 1px solid #3a4c80;
+      background: #0e1630;
+      color: #e6eeff;
+      padding: 7px 8px;
+      border-radius: 10px;
+    }
+    pre {
+      margin: 0;
+      padding: 12px;
+      background: #0e1630;
+      color: #cfe3ff;
+      height: 260px;
+      overflow: auto;
+      border-top: 1px solid #1f294a;
+      white-space: pre-wrap;
+    }
+    .footer {
+      padding: 10px 16px;
+      color: #aab8dd;
+      font-size: 12px;
+    }
+    code.kbd {
+      background: #0a1230;
+      border: 1px solid #2a3766;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+    .small {
+      font-size: 12px;
+    }
+    /* PrismJS token colouring for dark theme. These rules provide basic syntax
+       highlighting even if the external Prism CSS fails to load. Adjust colours as desired. */
+    .token.comment { color: #6a9955; }
+    .token.keyword { color: #569cd6; }
+    .token.string { color: #d69d85; }
+    .token.number { color: #b5cea8; }
+    .token.boolean { color: #569cd6; }
+    .token.function { color: #dcdcaa; }
+    .token.class-name { color: #4ec9b0; }
+    .token.operator { color: #d4d4d4; }
+    .token.punctuation { color: #d4d4d4; }
+    .token.builtin { color: #569cd6; }
+    @media (max-width: 920px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Python3インタプリタ</h1>
+  </header>
+  <main>
+    <section class="card">
+      <h2>Pythonコード</h2>
+      <div class="row">
+        <button class="btn" id="btnRun">▶ 実行</button>
+        <button class="btn" id="btnClearOut">出力クリア</button>
+        <!-- 新機能: Pythonコードから擬似言語への変換ボタン -->
+        <button class="btn" id="btnPseudo">擬似コード出力</button>
+        <select id="exampleSelect" title="例を選択">
+          <optgroup label="サンプル">
+            <option value=""> -- 例を選択 -- </option>
+            <option value="hello">Hello World</option>
+            <option value="factorial">階乗計算</option>
+            <option value="fizzbuzz">FizzBuzz</option>
+            <option value="fibonacci">フィボナッチ数列</option>
+          </optgroup>
+        </select>
+        <span class="muted">（Ctrl/Cmd+Enter で実行）</span>
+      </div>
+      <div id="editorWrap">
+        <div id="lineNumbers">1</div>
+        <div id="codeWrap">
+          <!-- highlight layer: displays syntax coloured HTML -->
+          <pre id="highlight" class="language-python" aria-hidden="true"></pre>
+          <!-- editable textarea: transparent text, caret visible; responsible for input -->
+          <textarea id="code" spellcheck="false" placeholder="ここにPython3コードを書きます…"></textarea>
+        </div>
+      </div>
+      <div class="footer small">
+        このインタープリターはブラウザ内で Python3 コードを実行します。<br />
+        <code class="kbd">print()</code> や <code class="kbd">input()</code> もサポートされます。エラーが発生した場合には Python のエラーメッセージが表示されます。
+      </div>
+    </section>
+    <section class="card">
+      <h2>出力</h2>
+      <pre id="stdout"></pre>
+    </section>
+    <!-- 新しいセクション: Pythonコードに対応する擬似コードを表示 -->
+    <section class="card">
+      <h2>擬似コード</h2>
+      <pre id="pseudoOut"></pre>
+    </section>
+  </main>
+  <!-- load pyodide from CDN; this script brings in the Python runtime compiled to WebAssembly -->
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"></script>
+  <!-- Prism.js core library for syntax highlighting -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-SH1KEKvZKB1zKmBI+a85FtPsHI4DSfrcyKxRbtnKidoyKeGgzsID4aUSaqZOvi9FftEnR0or8bqmJG40PJhX9A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <!-- Load Python language definition for Prism.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js" integrity="sha512-OkhQZB25dtfbWgNTsYyL/wHUsmZ3TCOd7rS5TtHsAWXbV8AwHbnd5peF67P7dfyhnvWuUuS6Soz/H98tHNfGbw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script>
+    // Prepare pyodide loading. This promise resolves when the runtime is ready.
+    let pyodideReadyPromise = loadPyodide();
+
+    /**
+     * Run the code currently in the textarea using pyodide.
+     * Output and errors are appended to the #stdout element.
+     */
+    async function runPy() {
+      const codeArea = document.getElementById('code');
+      const stdoutElem = document.getElementById('stdout');
+      const code = codeArea.value;
+      // Clear previous output
+      stdoutElem.textContent = '';
+      try {
+        const pyodide = await pyodideReadyPromise;
+        // Capture stdout and stderr
+        let outBuf = '';
+        let errBuf = '';
+        pyodide.setStdout({
+          batched(s) {
+            // Ensure each chunk ends with a newline to preserve line breaks in the display
+            if (!s.endsWith('\n')) {
+              s += '\n';
+            }
+            outBuf += s;
+            // Update the output area with the concatenated stdout and stderr
+            stdoutElem.textContent = outBuf + errBuf;
+          },
+        });
+        pyodide.setStderr({
+          batched(s) {
+            if (!s.endsWith('\n')) {
+              s += '\n';
+            }
+            errBuf += s;
+            stdoutElem.textContent = outBuf + errBuf;
+          },
+        });
+        // Provide a simple input function using prompt().
+        // When Python code calls input(), this JS function will be invoked.
+        pyodide.registerJsModule('js_input_helper', {
+          input: function(promptText) {
+            // Use window.prompt to get user input; convert null to empty string
+            const response = window.prompt(promptText ?? '');
+            return response === null ? '' : response;
+          },
+        });
+        // Prepare Python environment to hook input() to our helper
+        await pyodide.runPythonAsync(`import builtins, js_input_helper\n` +
+          `builtins.input = js_input_helper.input`);
+        // Execute the user code
+        await pyodide.runPythonAsync(code);
+      } catch (err) {
+        // Display any error from Python or JS as text
+        stdoutElem.textContent += String(err);
+      }
+    }
+
+    /**
+     * Clear the output pane.
+     */
+    function clearOutput() {
+      document.getElementById('stdout').textContent = '';
+    }
+
+    // Insert the selected example into the editor
+    const examples = {
+      hello: `print("Hello, World!")`,
+      factorial: `n = int(input("n? "))\n` +
+                `def fact(n):\n` +
+                `    return 1 if n <= 1 else n * fact(n-1)\n` +
+                `print(f"{n}! = {fact(n)}")`,
+      fizzbuzz: `for i in range(1, 21):\n` +
+                `    if i % 15 == 0: print("FizzBuzz")\n` +
+                `    elif i % 3 == 0: print("Fizz")\n` +
+                `    elif i % 5 == 0: print("Buzz")\n` +
+                `    else: print(i)`,
+      fibonacci: `def fib(n):\n` +
+                 `    a, b = 0, 1\n` +
+                 `    for _ in range(n):\n` +
+                 `        a, b = b, a + b\n` +
+                 `    return a\n` +
+                 `for i in range(10):\n` +
+                 `    print(fib(i))`,
+    };
+    const exampleSelect = document.getElementById('exampleSelect');
+    exampleSelect.addEventListener('change', () => {
+      const key = exampleSelect.value;
+      if (examples[key]) {
+        document.getElementById('code').value = examples[key];
+        updateLineNumbers();
+        updateHighlight();
+      }
+    });
+
+    // Line numbers updating
+    const codeArea = document.getElementById('code');
+    const lineNumbers = document.getElementById('lineNumbers');
+    const highlightElem = document.getElementById('highlight');
+    function updateLineNumbers() {
+      const lines = codeArea.value.split('\n').length || 1;
+      let buf = '1';
+      for (let i = 2; i <= lines; i++) {
+        buf += '\n' + i;
+      }
+      lineNumbers.textContent = buf;
+    }
+    // Basic Python syntax highlighting fallback. When Prism.js fails to load
+    // (for example in offline environments), this simple highlighter is used.
+    // It escapes HTML special characters and wraps recognised tokens in
+    // spans with the same class names Prism uses. Only a subset of Python
+    // syntax is covered (comments, strings, numbers, keywords and a few
+    // builtins), but this is sufficient to give the editor a colourful
+    // appearance. See accompanying CSS rules for token colours.
+    function simplePythonHighlight(src) {
+      // Escapes HTML special characters
+      function escapeHtml(str) {
+        return str
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;');
+      }
+      // Define sets for keywords and a handful of builtins for quick lookup
+      const keywords = new Set([
+        'False','class','finally','is','return','None','continue','for','lambda','try','True','def','from','nonlocal','while','and','del','global','not','with','as','elif','if','or','yield','assert','else','import','pass','break','except','in','raise'
+      ]);
+      const builtins = new Set([
+        'print','input','len','range','str','int','float','list','dict','set','tuple','bool'
+      ]);
+      let result = '';
+      let i = 0;
+      const len = src.length;
+      while (i < len) {
+        const ch = src[i];
+        // Comment: from '#' until the end of line
+        if (ch === '#') {
+          const start = i;
+          while (i < len && src[i] !== '\n') i++;
+          const text = src.slice(start, i);
+          result += '<span class="token comment">' + escapeHtml(text) + '</span>';
+          continue;
+        }
+        // String literals
+        if (ch === '"' || ch === "'") {
+          const quote = ch;
+          // Check for triple quotes
+          if (src.slice(i, i + 3) === quote + quote + quote) {
+            const start = i;
+            i += 3;
+            while (i < len && src.slice(i, i + 3) !== quote + quote + quote) {
+              i++;
+            }
+            i += 3; // include closing triple quotes
+            const text = src.slice(start, i);
+            result += '<span class="token string">' + escapeHtml(text) + '</span>';
+            continue;
+          } else {
+            const start = i;
+            i++;
+            while (i < len) {
+              const c2 = src[i];
+              if (c2 === '\\' && i + 1 < len) {
+                i += 2;
+                continue;
+              }
+              if (c2 === quote) {
+                i++;
+                break;
+              }
+              i++;
+            }
+            const text = src.slice(start, i);
+            result += '<span class="token string">' + escapeHtml(text) + '</span>';
+            continue;
+          }
+        }
+        // Numbers: integer or float, allow simple scientific notation
+        // Use [0-9] instead of \d to avoid double escaping in the HTML context
+        if (/[0-9]/.test(ch)) {
+          const start = i;
+          i++;
+          while (i < len && /[0-9.eE+-]/.test(src[i])) {
+            // Stop at a letter following a number (to avoid consuming part of an identifier)
+            if (/[A-Za-z_]/.test(src[i])) break;
+            i++;
+          }
+          const text = src.slice(start, i);
+          result += '<span class="token number">' + escapeHtml(text) + '</span>';
+          continue;
+        }
+        // Identifiers and keywords/builtins
+        if (/[A-Za-z_]/.test(ch)) {
+          const start = i;
+          i++;
+          while (i < len && /[A-Za-z0-9_]/.test(src[i])) i++;
+          const word = src.slice(start, i);
+          if (keywords.has(word)) {
+            result += '<span class="token keyword">' + escapeHtml(word) + '</span>';
+          } else if (builtins.has(word)) {
+            result += '<span class="token builtin">' + escapeHtml(word) + '</span>';
+          } else {
+            result += escapeHtml(word);
+          }
+          continue;
+        }
+        // Everything else (operators, punctuation, whitespace)
+        result += escapeHtml(ch);
+        i++;
+      }
+      return result;
+    }
+
+    // Update syntax highlighting by re‑highlighting the code string. If
+    // Prism.js is available it will be used, otherwise our simple
+    // highlighter provides a basic colourful fallback. The final newline
+    // ensures the highlight layer always has the same number of lines as
+    // the textarea, preventing scroll mismatches.
+    function updateHighlight() {
+      const src = codeArea.value;
+      if (typeof Prism !== 'undefined' && Prism.languages && Prism.languages.python) {
+        const html = Prism.highlight(src, Prism.languages.python, 'python');
+        highlightElem.innerHTML = html + '\n';
+      } else {
+        const html = simplePythonHighlight(src);
+        highlightElem.innerHTML = html + '\n';
+      }
+    }
+    // Synchronize line numbers and highlighting on input
+    codeArea.addEventListener('input', () => {
+      updateLineNumbers();
+      updateHighlight();
+    });
+    // Synchronize scrolling between the textarea, line numbers and the highlight overlay
+    codeArea.addEventListener('scroll', () => {
+      lineNumbers.scrollTop = codeArea.scrollTop;
+      highlightElem.scrollTop = codeArea.scrollTop;
+      highlightElem.scrollLeft = codeArea.scrollLeft;
+    });
+
+    // Run the interpreter when clicking the run button
+    document.getElementById('btnRun').addEventListener('click', runPy);
+    document.getElementById('btnClearOut').addEventListener('click', clearOutput);
+
+    // Keyboard shortcut: Ctrl+Enter or Cmd+Enter to run
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        runPy();
+      }
+    });
+
+    // Initialize line numbers on page load
+    updateLineNumbers();
+    updateHighlight();
+
+    /**
+     * Translate a subset of Python 3 syntax into the IPA風擬似言語. The translator
+     * handles basic assignments, print(), input() calls, for loops over range(),
+     * while loops, if/elif/else blocks and simple function definitions. Indentation
+     * is used to determine block structure and generate the corresponding end
+     * keywords (endfor, endwhile, endif, 手続き終わり). Unknown or unsupported
+     * statements are included as comments in the output. This translation is
+     * approximate and intended for educational purposes—it does not cover the
+     * full Python language.
+     *
+     * @param {string} code Python source code from the editor
+     * @returns {string} Pseudo code representation
+     */
+    function translatePythonToPseudo(code) {
+      const lines = code.split('\n');
+      const pseudo = [];
+      // Each entry in blockStack stores information about a control block.
+      // headerIndent: the indentation (in spaces) of the statement line (e.g. "for", "while", "if", etc.).
+      // bodyIndent: the indentation (in spaces) of the first line inside the block. In Python this is headerIndent + 4 (assuming 4-space indents).
+      // type: the kind of block (for/while/if/elif/else/def) so that we can emit an appropriate closing keyword when popping.
+      const blockStack = [];
+      /**
+       * Generate indentation string based on Python indent level. We use two
+       * spaces per indent level for the pseudo code output to enhance
+       * readability while still reflecting nesting depth.
+       *
+       * @param {number} indent number of spaces in the original line
+       */
+      function indentString(indent) {
+        // Convert a space-based indent to a pseudo-code indent. We use 4 spaces per level
+        // in Python and 2 spaces per level in the output. This mirrors the visual nesting
+        // of the original code while keeping the pseudo-code compact.
+        const level = Math.floor(indent / 4);
+        return '  '.repeat(level);
+      }
+      // Trim trailing colon from condition or header if present
+      function stripColon(s) {
+        return s.replace(/:\s*$/, '').trim();
+      }
+      // Process each line
+      lines.forEach((line) => {
+        const originalIndent = line.match(/^\s*/)[0].length;
+        const trimmed = line.trim();
+        // Skip completely empty lines
+        if (trimmed === '') {
+          return;
+        }
+        // Determine if this line is an elif or else continuation of an existing if-block
+        const isElifLine = /^elif\b/.test(trimmed);
+        const isElseLine = /^else\b/.test(trimmed);
+        // Before handling the current line, close any blocks whose body indentation is greater than the
+        // current line's indentation. However, when an elif/else continues an if-chain, we do not close
+        // the enclosing if-block; we only close deeper nested blocks (e.g. a for-loop inside the if).
+        while (blockStack.length > 0 && originalIndent < blockStack[blockStack.length - 1].bodyIndent) {
+          const blk = blockStack[blockStack.length - 1];
+          // If we're on an elif/else and the top block is an if-chain, stop popping to keep the chain open
+          if ((isElifLine || isElseLine) && (blk.type === 'if' || blk.type === 'elif' || blk.type === 'else')) {
+            break;
+          }
+          // Otherwise, pop the block and emit the appropriate closing keyword
+          blockStack.pop();
+          if (blk.type === 'for') {
+            pseudo.push(indentString(blk.headerIndent) + 'endfor');
+          } else if (blk.type === 'while') {
+            pseudo.push(indentString(blk.headerIndent) + 'endwhile');
+          } else if (blk.type === 'if' || blk.type === 'elif' || blk.type === 'else') {
+            pseudo.push(indentString(blk.headerIndent) + 'endif');
+          } else if (blk.type === 'def') {
+            pseudo.push(indentString(blk.headerIndent) + '手続き終わり');
+          }
+        }
+        // Comments beginning with '#' become pseudo comments
+        if (trimmed.startsWith('#')) {
+          pseudo.push(indentString(originalIndent) + '// ' + trimmed.slice(1).trim());
+          return;
+        }
+        // Function definition: def name(params):
+        let m = trimmed.match(/^def\s+([A-Za-z_][A-Za-z0-9_]*)\s*\((.*)\)\s*:/);
+        if (m) {
+          const name = m[1];
+          const params = m[2].split(',').map(p => p.trim()).filter(Boolean).join(', ');
+          pseudo.push(indentString(originalIndent) + `手続き ${name}(${params})`);
+          // For functions, the body starts one indent level deeper than the header
+          blockStack.push({ headerIndent: originalIndent, bodyIndent: originalIndent + 4, type: 'def' });
+          return;
+        }
+        // For loop over range with start and end: for i in range(start, end):
+        m = trimmed.match(/^for\s+([A-Za-z_][A-Za-z0-9_]*)\s+in\s+range\(([^,]+),\s*([^)]+)\)\s*:/);
+        if (m) {
+          const varName = m[1];
+          let start = stripColon(m[2]);
+          let end = stripColon(m[3]);
+          pseudo.push(indentString(originalIndent) + `for (${varName} ← ${start}; ${varName} < ${end}; ${varName} ← ${varName} + 1)`);
+          blockStack.push({ headerIndent: originalIndent, bodyIndent: originalIndent + 4, type: 'for' });
+          return;
+        }
+        // For loop over range with only end: for i in range(end):
+        m = trimmed.match(/^for\s+([A-Za-z_][A-Za-z0-9_]*)\s+in\s+range\(([^)]+)\)\s*:/);
+        if (m) {
+          const varName = m[1];
+          const end = stripColon(m[2]);
+          pseudo.push(indentString(originalIndent) + `for (${varName} ← 0; ${varName} < ${end}; ${varName} ← ${varName} + 1)`);
+          blockStack.push({ headerIndent: originalIndent, bodyIndent: originalIndent + 4, type: 'for' });
+          return;
+        }
+        // While loop: while condition:
+        m = trimmed.match(/^while\s+(.+)\s*:/);
+        if (m) {
+          const cond = stripColon(m[1]);
+          pseudo.push(indentString(originalIndent) + `while (${cond})`);
+          blockStack.push({ headerIndent: originalIndent, bodyIndent: originalIndent + 4, type: 'while' });
+          return;
+        }
+        // If/elif/else
+        m = trimmed.match(/^if\s+(.+)\s*:/);
+        if (m) {
+          const cond = stripColon(m[1]);
+          pseudo.push(indentString(originalIndent) + `if (${cond})`);
+          blockStack.push({ headerIndent: originalIndent, bodyIndent: originalIndent + 4, type: 'if' });
+          return;
+        }
+        m = trimmed.match(/^elif\s+(.+)\s*:/);
+        if (m) {
+          const cond = stripColon(m[1]);
+          // Use elseif in pseudo language. We do not push a new block; this line continues
+          // the existing if-block. The blockStack management happens above.
+          pseudo.push(indentString(originalIndent) + `elseif (${cond})`);
+          return;
+        }
+        m = trimmed.match(/^else\s*:/);
+        if (m) {
+          // Else branch of if-chain. Do not push a new block; this continues the existing if-block.
+          pseudo.push(indentString(originalIndent) + 'else');
+          return;
+        }
+        // Input call assigned to variable: x = input(...)
+        m = trimmed.match(/^([A-Za-z_][A-Za-z0-9_]*)\s*=\s*input\((.*)\)\s*$/);
+        if (m) {
+          const varName = m[1];
+          pseudo.push(indentString(originalIndent) + `入力(${varName})`);
+          return;
+        }
+        // Input call without assignment: input(...)
+        m = trimmed.match(/^input\((.*)\)\s*$/);
+        if (m) {
+          pseudo.push(indentString(originalIndent) + '入力()');
+          return;
+        }
+        // Print statement
+        m = trimmed.match(/^print\((.*)\)\s*$/);
+        if (m) {
+          const expr = stripColon(m[1]);
+          pseudo.push(indentString(originalIndent) + `出力(${expr})`);
+          return;
+        }
+        // Assignment: var = expr
+        m = trimmed.match(/^([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.+)$/);
+        if (m) {
+          const varName = m[1];
+          const expr = stripColon(m[2]);
+          pseudo.push(indentString(originalIndent) + `${varName} ← ${expr}`);
+          return;
+        }
+        // Return statement in functions
+        m = trimmed.match(/^return\s+(.+)$/);
+        if (m) {
+          const expr = stripColon(m[1]);
+          pseudo.push(indentString(originalIndent) + `戻り値 ← ${expr}`);
+          return;
+        }
+        // Fallback: unknown statement
+        pseudo.push(indentString(originalIndent) + '// ' + trimmed);
+      });
+      // Close any remaining blocks
+      while (blockStack.length > 0) {
+        const blk = blockStack.pop();
+        if (blk.type === 'for') {
+          pseudo.push(indentString(blk.headerIndent) + 'endfor');
+        } else if (blk.type === 'while') {
+          pseudo.push(indentString(blk.headerIndent) + 'endwhile');
+        } else if (blk.type === 'if' || blk.type === 'elif' || blk.type === 'else') {
+          pseudo.push(indentString(blk.headerIndent) + 'endif');
+        } else if (blk.type === 'def') {
+          pseudo.push(indentString(blk.headerIndent) + '手続き終わり');
+        }
+      }
+      return pseudo.join('\n');
+    }
+
+    // Generate pseudo code from the current content of the code editor and display it
+    function generatePseudo() {
+      const codeSrc = codeArea.value;
+      const pseudoOutElem = document.getElementById('pseudoOut');
+      try {
+        const pseudo = translatePythonToPseudo(codeSrc);
+        pseudoOutElem.textContent = pseudo;
+      } catch (err) {
+        pseudoOutElem.textContent = '[Error] 擬似コード変換中にエラーが発生しました: ' + String(err);
+      }
+    }
+
+    // Hook up the pseudo code button
+    document.getElementById('btnPseudo').addEventListener('click', generatePseudo);
+  </script>
+</body>
+</html>
