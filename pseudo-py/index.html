@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' https://cdnjs.cloudflare.com; worker-src 'self' blob:;" />
   <title>Python3インタプリタ（ブラウザ実行）</title>
   <!-- Prism.js dark theme for syntax highlighting -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" integrity="sha512-VlM7TsFMkCV459pAtZ1rJlop1tgaOSpefdcR0fEu7gvfYifW4UudlGpSMqWoSA39wcnV7B/jOZHYceEAKiU2nA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -213,7 +214,7 @@
     <section class="card">
       <h2>Pythonコード</h2>
       <div class="row">
-        <button class="btn" id="btnRun">▶ 実行</button>
+        <button class="btn" id="btnRun" disabled>▶ 実行</button>
         <button class="btn" id="btnClearOut">出力クリア</button>
         <!-- 新機能: Pythonコードから擬似言語への変換ボタン -->
         <button class="btn" id="btnPseudo">擬似コード出力</button>
@@ -253,7 +254,8 @@
     </section>
   </main>
   <!-- load pyodide from CDN; this script brings in the Python runtime compiled to WebAssembly -->
-  <script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"></script>
+  <!-- TODO: Replace integrity hash with the value for the deployed pyodide.js -->
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js" integrity="sha256-REPLACE_WITH_REAL_HASH" crossorigin="anonymous"></script>
   <!-- Prism.js core library for syntax highlighting -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-SH1KEKvZKB1zKmBI+a85FtPsHI4DSfrcyKxRbtnKidoyKeGgzsID4aUSaqZOvi9FftEnR0or8bqmJG40PJhX9A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <!-- Load Python language definition for Prism.js -->
@@ -261,6 +263,10 @@
   <script>
     // Prepare pyodide loading. This promise resolves when the runtime is ready.
     let pyodideReadyPromise = loadPyodide();
+    const runBtn = document.getElementById('btnRun');
+    pyodideReadyPromise.then(() => {
+      runBtn.disabled = false;
+    });
 
     /**
      * Run the code currently in the textarea using pyodide.
@@ -366,124 +372,15 @@
       }
       lineNumbers.textContent = buf;
     }
-    // Basic Python syntax highlighting fallback. When Prism.js fails to load
-    // (for example in offline environments), this simple highlighter is used.
-    // It escapes HTML special characters and wraps recognised tokens in
-    // spans with the same class names Prism uses. Only a subset of Python
-    // syntax is covered (comments, strings, numbers, keywords and a few
-    // builtins), but this is sufficient to give the editor a colourful
-    // appearance. See accompanying CSS rules for token colours.
-    function simplePythonHighlight(src) {
-      // Escapes HTML special characters
-      function escapeHtml(str) {
-        return str
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;');
-      }
-      // Define sets for keywords and a handful of builtins for quick lookup
-      const keywords = new Set([
-        'False','class','finally','is','return','None','continue','for','lambda','try','True','def','from','nonlocal','while','and','del','global','not','with','as','elif','if','or','yield','assert','else','import','pass','break','except','in','raise'
-      ]);
-      const builtins = new Set([
-        'print','input','len','range','str','int','float','list','dict','set','tuple','bool'
-      ]);
-      let result = '';
-      let i = 0;
-      const len = src.length;
-      while (i < len) {
-        const ch = src[i];
-        // Comment: from '#' until the end of line
-        if (ch === '#') {
-          const start = i;
-          while (i < len && src[i] !== '\n') i++;
-          const text = src.slice(start, i);
-          result += '<span class="token comment">' + escapeHtml(text) + '</span>';
-          continue;
-        }
-        // String literals
-        if (ch === '"' || ch === "'") {
-          const quote = ch;
-          // Check for triple quotes
-          if (src.slice(i, i + 3) === quote + quote + quote) {
-            const start = i;
-            i += 3;
-            while (i < len && src.slice(i, i + 3) !== quote + quote + quote) {
-              i++;
-            }
-            i += 3; // include closing triple quotes
-            const text = src.slice(start, i);
-            result += '<span class="token string">' + escapeHtml(text) + '</span>';
-            continue;
-          } else {
-            const start = i;
-            i++;
-            while (i < len) {
-              const c2 = src[i];
-              if (c2 === '\\' && i + 1 < len) {
-                i += 2;
-                continue;
-              }
-              if (c2 === quote) {
-                i++;
-                break;
-              }
-              i++;
-            }
-            const text = src.slice(start, i);
-            result += '<span class="token string">' + escapeHtml(text) + '</span>';
-            continue;
-          }
-        }
-        // Numbers: integer or float, allow simple scientific notation
-        // Use [0-9] instead of \d to avoid double escaping in the HTML context
-        if (/[0-9]/.test(ch)) {
-          const start = i;
-          i++;
-          while (i < len && /[0-9.eE+-]/.test(src[i])) {
-            // Stop at a letter following a number (to avoid consuming part of an identifier)
-            if (/[A-Za-z_]/.test(src[i])) break;
-            i++;
-          }
-          const text = src.slice(start, i);
-          result += '<span class="token number">' + escapeHtml(text) + '</span>';
-          continue;
-        }
-        // Identifiers and keywords/builtins
-        if (/[A-Za-z_]/.test(ch)) {
-          const start = i;
-          i++;
-          while (i < len && /[A-Za-z0-9_]/.test(src[i])) i++;
-          const word = src.slice(start, i);
-          if (keywords.has(word)) {
-            result += '<span class="token keyword">' + escapeHtml(word) + '</span>';
-          } else if (builtins.has(word)) {
-            result += '<span class="token builtin">' + escapeHtml(word) + '</span>';
-          } else {
-            result += escapeHtml(word);
-          }
-          continue;
-        }
-        // Everything else (operators, punctuation, whitespace)
-        result += escapeHtml(ch);
-        i++;
-      }
-      return result;
-    }
 
-    // Update syntax highlighting by re‑highlighting the code string. If
-    // Prism.js is available it will be used, otherwise our simple
-    // highlighter provides a basic colourful fallback. The final newline
-    // ensures the highlight layer always has the same number of lines as
-    // the textarea, preventing scroll mismatches.
+    // Update syntax highlighting by re‑highlighting the code string.
+    // The final newline ensures the highlight layer always has the same
+    // number of lines as the textarea, preventing scroll mismatches.
     function updateHighlight() {
-      const src = codeArea.value;
-      if (typeof Prism !== 'undefined' && Prism.languages && Prism.languages.python) {
-        const html = Prism.highlight(src, Prism.languages.python, 'python');
-        highlightElem.innerHTML = html + '\n';
-      } else {
-        const html = simplePythonHighlight(src);
-        highlightElem.innerHTML = html + '\n';
+      const src = codeArea.value + '\n';
+      highlightElem.textContent = src;
+      if (typeof Prism !== 'undefined' && Prism.highlightElement) {
+        Prism.highlightElement(highlightElem);
       }
     }
     // Synchronize line numbers and highlighting on input
