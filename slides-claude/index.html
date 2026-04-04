@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>【AIエージェント】Claude Cowork・Code はじめの一歩</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="presentation">
+
+        <!-- Title Slide -->
+        <div class="slide active">
+            <div class="glass-card" style="text-align: center;">
+                <img src="../skillmarket/ai_support_thumbnail.png" alt="Claude Cowork Hero" class="hero-image">
+                <h1 style="font-size: 2.8rem;">【AIエージェント】Claude Cowork・Code<br><span
+                        style="font-size: 2rem; color: #aaa;">はじめの一歩</span></h1>
+                <p style="font-size: 1.2rem; color: #888; margin-top: 1rem;">〜普通の言葉で話しかけるだけでAIが代わりに働いてくれる〜</p>
+            </div>
+        </div>
+
+        <!-- Slide 1: Claude Coworkとは -->
+        <div class="slide">
+            <div class="glass-card">
+                <h2>Claude Cowork・Codeってなに？</h2>
+                <div class="content-grid">
+                    <ul>
+                        <li><strong>パソコンの中のAIエージェント：</strong>自分の代わりに働いてくれる、まるで優秀なアシスタントを雇ったような使い心地。</li>
+                        <li><strong>普通のAIチャットとの違い：</strong>ChatGPTやClaudeチャットは「質問に答える」だけ。Cowork・Codeは「タスクを最後まで自動でやりきる」。
+                        </li>
+                        <li><strong>プログラミング不要：</strong>「このフォルダのファイルをまとめてレポートにして」などと一言お願いするだけ。</li>
+                    </ul>
+                    <div
+                        style="background: linear-gradient(145deg,#fff0f8,#e8f7ef); border-radius: 16px; padding: 1.5rem; text-align: center; border: 1px solid rgba(217,111,160,0.15);">
+                        <span style="font-size: 5rem;">🤖</span>
+                        <p style="margin-top: 0.5rem; color: #8a7a8e; font-size: 0.95rem;">AIが自律的に<br>タスクをこなす</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: 3ツール比較 -->
+        <div class="slide">
+            <div class="glass-card">
+                <h2>Claudeチャット・Cowork・Code の違い</h2>
+                <div class="step-grid">
+                    <div class="step-card">
+                        <span style="font-size: 2.5rem;">💬</span>
+                        <p class="step-title" style="margin-top: 0.5rem;">Claude チャット</p>
+                        <p style="color: var(--accent-color); font-size: 0.8rem; margin-bottom: 0.5rem;">みんなのAIチャット</p>
+                        <p class="step-desc">質問・文章作成・翻訳・要約。ブラウザ／スマホで使える。<br><strong style="color:#3d2c3e;">→
+                                AIを使い始めたい人</strong></p>
+                    </div>
+                    <div class="step-card">
+                        <span style="font-size: 2.5rem;">🤖</span>
+                        <p class="step-title" style="margin-top: 0.5rem;">Claude Cowork</p>
+                        <p style="color: var(--accent-color); font-size: 0.8rem; margin-bottom: 0.5rem;">非エンジニアの自動化ツール
+                        </p>
+                        <p class="step-desc">複数ステップを自律実行。アプリ必要・有料プラン。<br><strong style="color:#3d2c3e;">→
+                                繰り返し作業を任せたい人</strong></p>
+                    </div>
+                    <div class="step-card">
+                        <span style="font-size: 2.5rem;">💻</span>
+                        <p class="step-title" style="margin-top: 0.5rem;">Claude Code</p>
+                        <p style="color: var(--accent-color); font-size: 0.8rem; margin-bottom: 0.5rem;">エンジニアの開発パートナー
+                        </p>
+                        <p class="step-desc">コード修正・バグ解決・機能追加。ターミナルから操作。<br><strong style="color:#3d2c3e;">→
+                                プログラマー向け</strong></p>
+                    </div>
+                </div>
+                <p style="text-align: center; margin-top: 1.5rem; color: #888; font-size: 0.9rem;">
+                    3つは競合ではなく、場面・目的が違うツール。組み合わせて使うのが◎
+                </p>
+            </div>
+        </div>
+
+        <!-- Slide 3: 必要なもの -->
+        <div class="slide">
+            <div class="glass-card">
+                <h2>使うために必要なもの</h2>
+                <div class="step-grid" style="grid-template-columns: repeat(3, 1fr);">
+                    <div class="step-card">
+                        <span style="font-size: 3rem;">💻</span>
+                        <p class="step-title" style="margin-top: 0.5rem;">パソコン</p>
+                        <p class="step-desc">Mac または Windows<br>（スマホ・タブレット不可）</p>
+                    </div>
+                    <div class="step-card">
+                        <span style="font-size: 3rem;">📥</span>
+                        <p class="step-title" style="margin-top: 0.5rem;">Claude Desktop アプリ</p>
+                        <p class="step-desc">claude.com/download<br>から無料でDL可能</p>
+                    </div>
+                    <div class="step-card">
+                        <span style="font-size: 3rem;">💳</span>
+                        <p class="step-title" style="margin-top: 0.5rem;">有料プラン</p>
+                        <p class="step-desc">Proプラン（月20ドル〜）<br>以上への加入が必要</p>
+                    </div>
+                </div>
+                <p
+                    style="text-align: center; margin-top: 2rem; color: #c0507a; font-size: 0.9rem; background: #fff0f6; border-radius: 10px; padding: 0.7rem 1rem; border: 1px solid #f7b8d0;">
+                    ⚠️ 作業中はClaude Desktopのアプリを開いたままにしておく必要があります
+                </p>
+            </div>
+        </div>
+
+        <!-- Slide 3: はじめかた3ステップ -->
+        <div class="slide">
+            <div class="glass-card">
+                <h2>はじめかた：3ステップ</h2>
+                <div class="step-grid">
+                    <div class="step-card">
+                        <span class="step-number">01</span>
+                        <p class="step-title">Claude Desktopをインストール</p>
+                        <p class="step-desc">claude.com/download からダウンロード。すでにインストール済みの方は最新版にアップデート。</p>
+                    </div>
+                    <div class="step-card">
+                        <span class="step-number">02</span>
+                        <p class="step-title">Coworkタブを選ぶ</p>
+                        <p class="step-desc">アプリを起動すると「Chat」と「Cowork」のタブが表示される。「Cowork」をクリック。</p>
+                    </div>
+                    <div class="step-card">
+                        <span class="step-number">03</span>
+                        <p class="step-title">作業するフォルダを指定</p>
+                        <p class="step-desc">AIがアクセスしてよいフォルダを指定。最初はテスト用の新しいフォルダがおすすめ。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: できること -->
+        <div class="slide">
+            <div class="glass-card">
+                <h2>こんなことができます</h2>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <span class="feature-icon">📄</span>
+                        <div class="feature-text">
+                            <strong>文書・資料を作る</strong>
+                            <p>報告書・WordファイルはもちろんExcel・PowerPointも作成可能</p>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <span class="feature-icon">📁</span>
+                        <div class="feature-text">
+                            <strong>ファイルを整理する</strong>
+                            <p>「種類別に分けて」と頼むだけで自動でフォルダ分類</p>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <span class="feature-icon">📊</span>
+                        <div class="feature-text">
+                            <strong>データをまとめる</strong>
+                            <p>複数Excelを1シートに集計、グラフ作成も得意</p>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <span class="feature-icon">🔍</span>
+                        <div class="feature-text">
+                            <strong>調べてまとめる</strong>
+                            <p>複数ドキュメントを読み込んで要点整理・レポート化</p>
+                        </div>
+                    </div>
+                    <div class="feature-card" style="grid-column: 1 / -1;">
+                        <span class="feature-icon">⏰</span>
+                        <div class="feature-text">
+                            <strong>定期的な作業を自動化する</strong>
+                            <p>「毎週月曜日に〇〇をやっておいて」のようなスケジュール設定で繰り返し作業を自動化</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: 上手に使うコツ -->
+        <div class="slide">
+            <div class="glass-card">
+                <h2>上手に使うためのコツ</h2>
+                <div class="tips-grid">
+                    <div class="tip-card">
+                        <strong>① 指示は具体的に</strong>
+                        <p>「いい感じにまとめて」より「A4用紙1枚分で箇条書き3点」のように、何をどんな形で欲しいかを具体的に。</p>
+                    </div>
+                    <div class="tip-card">
+                        <strong>② 最初は小さなタスクから</strong>
+                        <p>いきなり大量ファイルより、まずはファイル1〜2枚の簡単な作業で試してみましょう。</p>
+                    </div>
+                    <div class="tip-card">
+                        <strong>③ 大切なファイルはバックアップを</strong>
+                        <p>AIがファイルを操作するので、念のため事前にコピーしておくと安心です。</p>
+                    </div>
+                    <div class="tip-card">
+                        <strong>④ 途中経過を確認できる</strong>
+                        <p>作業の進み具合を画面表示しながら進むので「違うな」と思ったら途中でストップも可能。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Slide 7: 安全に使うために -->
+        <div class="slide">
+            <div class="glass-card">
+                <h2>⚠️ AIを安全に運用するために</h2>
+                <div class="content-grid" style="grid-template-columns: 1fr;">
+                    <div>
+                        <ul style="margin: 0; padding-left: 1.5rem;">
+                            <li><strong style="color: #c0507a;">コマンド・機能実行時の「事前確認」</strong><br>
+                                AIエージェントは設定により、安全なコマンド以外（外部通信など）は実行前に必ずユーザーの承認（Approve）を求めます。内容を確認してから実行してください。
+                            </li>
+                            <li style="margin-top: 1.5rem;"><strong
+                                    style="color: #c0507a;">見知らぬ拡張機能・スクリプトへの注意</strong><br>
+                                出所が不明なプロジェクトの自動化機能（ワークフローやスキル）をそのまま実行すると、予期せぬ動作を招く恐れがあります。
+                            </li>
+                        </ul>
+                        <p style="text-align: center; margin-top: 2rem; color: #8a7a8e; font-size: 0.95rem;">
+                            ※ AIの能力を最大限活かすためには、「安全な作業環境（サンドボックス等）」の意識と自己防衛が重要です。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: まとめ -->
+        <div class="slide">
+            <div class="glass-card">
+                <h2>まとめ</h2>
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <p style="font-size: 1.5rem; margin-bottom: 1rem;">「話しかけるだけ」で繰り返し作業を自動化</p>
+                </div>
+                <div class="content-grid">
+                    <div
+                        style="background: linear-gradient(145deg,#e8f7ef,#fff); padding: 1.5rem; border-radius: 16px; border: 1px solid #bde5d7;">
+                        <p style="color: #7bbfa5; font-weight: bold;">Claude Cowork・Codeができること</p>
+                        <p style="color: #3d2c3e;">文書作成・ファイル整理・データ集計・自動化</p>
+                    </div>
+                    <div
+                        style="background: linear-gradient(145deg,#fff0f8,#fff); padding: 1.5rem; border-radius: 16px; border: 1px solid #f7b8d0;">
+                        <p style="color: #d96fa0; font-weight: bold;">まず最初の一歩</p>
+                        <p style="color: #3d2c3e;">テスト用フォルダを作って、簡単なお願いをしてみる</p>
+                    </div>
+                </div>
+                <p style="text-align: center; margin-top: 2rem; font-style: italic;">
+                    「AIと一緒に働く新しい体験」をぜひ気軽に試してみてください！
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="controls">
+        <button class="fullscreen">全画面 (F)</button>
+        <button class="prev">← Prev</button>
+        <button class="next">Next →</button>
+    </div>
+    <div class="progress-bar"></div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,329 @@
+:root {
+    --bg-color: #fdf6f9;
+    --bg-gradient-start: #fff0f5;
+    --bg-gradient-end: #f0f8ff;
+    --text-color: #3d2c3e;
+    --text-muted: #8a7a8e;
+    --accent-color: #d96fa0;
+    --accent-light: #f7b8d0;
+    --secondary-accent: #7bbfa5;
+    --secondary-light: #bde5d7;
+    --sky-blue: #6aadcf;
+    --card-bg: rgba(255, 255, 255, 0.85);
+    --card-border: rgba(217, 111, 160, 0.2);
+    --font-main: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background:
+        radial-gradient(ellipse at top left, #ffe4f0 0%, transparent 50%),
+        radial-gradient(ellipse at bottom right, #d4eef8 0%, transparent 50%),
+        radial-gradient(ellipse at top right, #e8f7ef 0%, transparent 50%),
+        #fdf6f9;
+    color: var(--text-color);
+    font-family: var(--font-main);
+    overflow: hidden;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ─── 桜の花びら装飾 ─── */
+body::before,
+body::after {
+    content: '🌸';
+    position: fixed;
+    font-size: 2rem;
+    opacity: 0.15;
+    pointer-events: none;
+}
+body::before { top: 2rem; left: 2rem; font-size: 3rem; }
+body::after  { bottom: 5rem; right: 14rem; font-size: 2rem; }
+
+.presentation {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    perspective: 1000px;
+}
+
+.slide {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    padding: 2rem 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+    transform: translateY(20px) scale(0.95);
+}
+
+.slide.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+}
+
+.glass-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--card-border);
+    border-radius: 28px;
+    padding: 3rem 3.5rem;
+    max-width: 1200px;
+    width: 100%;
+    box-shadow:
+        0 4px 24px rgba(217, 111, 160, 0.12),
+        0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+h1 {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(120deg, var(--accent-color), var(--sky-blue));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-align: center;
+}
+
+h2 {
+    font-size: 2.6rem;
+    margin-bottom: 1.6rem;
+    color: var(--accent-color);
+    border-left: 6px solid var(--accent-light);
+    padding-left: 1.2rem;
+}
+
+ul {
+    list-style: none;
+}
+
+li {
+    font-size: 1.3rem;
+    margin-bottom: 1.2rem;
+    position: relative;
+    padding-left: 2rem;
+    line-height: 1.7;
+    color: var(--text-color);
+}
+
+li::before {
+    content: "🌸";
+    font-size: 0.9rem;
+    position: absolute;
+    left: 0;
+    top: 2px;
+}
+
+.hero-image {
+    width: 100%;
+    max-height: 420px;
+    object-fit: contain;
+    border-radius: 0;
+    margin-bottom: 1.5rem;
+    -webkit-mask-image: radial-gradient(ellipse 88% 88% at 50% 50%, black 55%, transparent 100%);
+    mask-image: radial-gradient(ellipse 88% 88% at 50% 50%, black 55%, transparent 100%);
+}
+
+/* ─── コントロールボタン ─── */
+.controls {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    display: flex;
+    gap: 1rem;
+    z-index: 100;
+}
+
+button {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1.5px solid var(--accent-light);
+    color: var(--accent-color);
+    padding: 0.8rem 1.4rem;
+    border-radius: 50px;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    transition: all 0.3s;
+    font-size: 0.95rem;
+    font-weight: 600;
+    box-shadow: 0 2px 12px rgba(217, 111, 160, 0.15);
+}
+
+button:hover {
+    background: var(--accent-color);
+    color: #fff;
+    border-color: var(--accent-color);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(217, 111, 160, 0.3);
+}
+
+button.fullscreen {
+    background: rgba(217, 111, 160, 0.1);
+    border-color: var(--accent-color);
+}
+
+button.fullscreen:hover {
+    background: var(--accent-color);
+    color: #fff;
+}
+
+/* ─── プログレスバー ─── */
+.progress-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent-color), var(--sky-blue));
+    width: 0%;
+    transition: width 0.3s ease;
+    border-radius: 0 2px 0 0;
+}
+
+/* ─── グリッドレイアウト ─── */
+.content-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 2.5rem;
+    align-items: center;
+    width: 100%;
+}
+
+/* ─── ステップカード ─── */
+.step-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.step-card {
+    background: linear-gradient(145deg, #fff8fc, #fff);
+    border: 1.5px solid var(--card-border);
+    border-radius: 18px;
+    padding: 1.5rem 1.2rem;
+    text-align: center;
+    box-shadow: 0 2px 12px rgba(217, 111, 160, 0.08);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.step-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 24px rgba(217, 111, 160, 0.18);
+}
+
+.step-number {
+    font-size: 2.2rem;
+    font-weight: bold;
+    background: linear-gradient(120deg, var(--accent-color), var(--sky-blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.step-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-color);
+    margin-bottom: 0.5rem;
+}
+
+.step-desc {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+
+/* ─── フィーチャーカード ─── */
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.1rem;
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.feature-card {
+    background: linear-gradient(145deg, #fff8fc, #fff);
+    border-radius: 14px;
+    padding: 1rem 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border: 1px solid rgba(217, 111, 160, 0.15);
+    box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+}
+
+.feature-icon {
+    font-size: 1.8rem;
+    flex-shrink: 0;
+}
+
+.feature-text strong {
+    display: block;
+    color: var(--accent-color);
+    margin-bottom: 0.2rem;
+    font-size: 1.1rem;
+}
+
+.feature-text p {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+/* ─── Tipsカード ─── */
+.tips-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.1rem;
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.tip-card {
+    background: linear-gradient(145deg, #f0faf6, #fff);
+    border-radius: 14px;
+    padding: 1.2rem;
+    border-left: 4px solid var(--secondary-accent);
+    box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+}
+
+.tip-card strong {
+    color: var(--secondary-accent);
+    display: block;
+    margin-bottom: 0.4rem;
+    font-size: 1.1rem;
+}
+
+.tip-card p {
+    font-size: 1rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+
+/* ─── レスポンシブ ─── */
+@media (max-width: 768px) {
+    .content-grid,
+    .step-grid,
+    .feature-grid,
+    .tips-grid {
+        grid-template-columns: 1fr;
+    }
+
+    h1 { font-size: 2rem; }
+    h2 { font-size: 1.6rem; }
+}
