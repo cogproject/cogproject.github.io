@@ -126,5 +126,28 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
+// ─── タッチスワイプ操作（スマホ対応） ───
+let touchStartX = 0;
+let touchStartY = 0;
+
+document.addEventListener('touchstart', (e) => {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+}, { passive: true });
+
+document.addEventListener('touchend', (e) => {
+    const deltaX = e.changedTouches[0].clientX - touchStartX;
+    const deltaY = e.changedTouches[0].clientY - touchStartY;
+
+    // 横スワイプが縦より大きく、かつ50px以上の場合のみ反応
+    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
+        if (deltaX < 0 && currentSlide < slides.length - 1) {
+            showSlide(currentSlide + 1);
+        } else if (deltaX > 0 && currentSlide > 0) {
+            showSlide(currentSlide - 1);
+        }
+    }
+}, { passive: true });
+
 // Initialize first slide
 showSlide(0);
